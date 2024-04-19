@@ -1,5 +1,7 @@
 local lu = dofile('../../src/hclua/vendor/luaunit/luaunit.lua')
 local list = dofile('../../src/hclua/lib/container/list.lua')
+local ring = dofile('../../src/hclua/lib/container/ring.lua')
+
 local function checkListLen(li, len)
     local n = li:len()
     lu.assertEquals(n, len)
@@ -148,11 +150,11 @@ function TestListRemove()
     local e1 = l:pushBack(1)
     local e2 = l:pushBack(2)
     checkListPointers(l, { e1, e2 })
-    local e=l:front()
+    local e = l:front()
     l:remove(e)
-    checkListPointers(l, {e2 })
+    checkListPointers(l, { e2 })
     l:remove(e)
-    checkListPointers(l, {e2 })
+    checkListPointers(l, { e2 })
 end
 
 function TestListMove()
@@ -199,34 +201,187 @@ function TestListMove()
     l:moveAfter(e2, e3)
     checkListPointers(l, { e1, e3, e2, e4 })
 end
-function TestListInsertBeforeUnknownMark()
-    local l=list.new()
-    l:pushBack(1)
-    l:pushBack(2)
-    l:pushBack(3)
-    l:insertBefore(1,list.ListItem:new())
-    checkList(l,{1,2,3})
-end
-function TestListInsertAfterUnknownMark()
-    local l=list.new()
-    l:pushBack(1)
-    l:pushBack(2)
-    l:pushBack(3)
-    l:insertAfter(1,list.ListItem:new())
-    checkList(l,{1,2,3})
-end
-function TestListMoveUnknownMark()
-    local l1=list.new()
-    local e1=l1:pushBack(1)
 
-    local l2=list.new()
-    local e2=l2:pushBack(2)
-    l1:moveAfter(e1,e2)
-    checkList(l1,{1})
-    checkList(l2,{2})
-    l1:moveBefore(e1,e2)
-    checkList(l1,{1})
-    checkList(l2,{2})
-    
+function TestListInsertBeforeUnknownMark()
+    local l = list.new()
+    l:pushBack(1)
+    l:pushBack(2)
+    l:pushBack(3)
+    l:insertBefore(1, list.ListItem:new())
+    checkList(l, { 1, 2, 3 })
 end
+
+function TestListInsertAfterUnknownMark()
+    local l = list.new()
+    l:pushBack(1)
+    l:pushBack(2)
+    l:pushBack(3)
+    l:insertAfter(1, list.ListItem:new())
+    checkList(l, { 1, 2, 3 })
+end
+
+function TestListMoveUnknownMark()
+    local l1 = list.new()
+    local e1 = l1:pushBack(1)
+
+    local l2 = list.new()
+    local e2 = l2:pushBack(2)
+    l1:moveAfter(e1, e2)
+    checkList(l1, { 1 })
+    checkList(l2, { 2 })
+    l1:moveBefore(e1, e2)
+    checkList(l1, { 1 })
+    checkList(l2, { 2 })
+end
+
+local function verify(r, N, sum)
+    if r == nil then
+        lu.assertEquals(0, N)
+        return
+    end
+    local n = r:len()
+    lu.assertEquals(n, N)
+    n = 0
+    local s = 0
+    r:apply(function(p)
+        n = n + 1
+        if (p ~= nil) then
+            s = s + p
+        end
+    end)
+    lu.assertEquals(n, N)
+    lu.assertNotIsTrue(sum >= 0 and s ~= sum)
+    if r == nil then
+        return
+    end
+    if r._next ~= nil then
+        local p
+        local q = r
+        while p == nil or q ~= r do
+            lu.assertNotIsTrue(p ~= nil and p ~= q:prev())
+            p = q
+            q = q:next()
+        end
+        lu.assertNotIsTrue(p ~= r:prev())
+    end
+    lu.assertNotIsTrue(r:next() ~= r._next)
+    lu.assertNotIsTrue(r:prev() ~= r._prev)
+    lu.assertNotIsTrue(r:move(0) ~= r)
+    for i = 0, 9, 1 do
+        local ni = N + i
+        local mi = ni % n
+        lu.assertNotIsTrue(r:move(ni) ~= r:move(mi))
+        lu.assertNotIsTrue(r:move(-ni) ~= r:move(-mi))
+    end
+end
+local function makeN(n)
+    local r = ring.new(n)
+    local i = 1
+    while i <= n do
+        r:withValue(i)
+        i = i + 1
+        r = r:next()
+    end
+    return r
+end
+local function sumN(n)
+    return (n * n + n) / 2
+end
+function TestRingNew()
+    local i = 0
+    while i < 10 do
+        local r = ring.new(i)
+        verify(r, i, -1)
+        i = i + 1
+    end
+    i = 0
+    while i < 10 do
+        local r = makeN(i)
+        verify(r, i, sumN(i))
+        i = i + 1
+    end
+end
+
+function TestRingLink1()
+    local r1a = makeN(1)
+    local r1b = ring.new(1)
+    local r2a = r1a:link(r1b)
+    verify(r2a, 2, 1)
+    lu.assertNotIsTrue(r2a ~= r1a)
+    local r2b = r2a:link(r2a:next())
+    verify(r2b, 2, 1)
+    lu.assertNotIsTrue(r2b ~= r2a:next())
+    local r1c = r2b:link(r2b)
+    verify(r1c, 1, 1)
+    verify(r2b, 1, 0)
+end
+
+function TestRingLink2()
+    local r0
+    local r1a = ring.Ring:new():withValue(42)
+    local r1b = ring.Ring:new():withValue(77)
+    local r10 = makeN(10)
+    r1a:link(r0)
+    verify(r1a, 1, 42)
+    r1a:link(r1b)
+    verify(r1a, 2, 42 + 77)
+    r10:link(r0)
+    verify(r10, 10, sumN(10))
+    r10:link(r1a)
+    verify(r10, 12, sumN(10) + 42 + 77)
+end
+
+function TestRingLink3()
+    local r = ring.Ring:new()
+    local n = 1
+    local i = 1
+    while i < 10 do
+        n = n + i
+        verify(r:link(ring.new(i)), n, -1)
+        i = i + 1
+    end
+end
+
+function TestRingUnlink()
+    local r10 = makeN(10)
+    local s10 = r10:move(6)
+    local sum10 = sumN(10)
+    verify(r10, 10, sum10)
+    verify(s10, 10, sum10)
+
+    local r0 = r10:unlink(0)
+    verify(r0, 0, 0)
+
+    local r1 = r10:unlink(1)
+    verify(r1, 1, 2)
+    verify(r10, 9, sum10 - 2)
+
+    local r9 = r10:unlink(9)
+    verify(r9, 9, sum10 - 2)
+    verify(r10, 9, sum10 - 2)
+end
+
+function TestRingtLinkUnlink()
+    local i=1
+    while i<4 do
+        local ri=ring.new(i)
+        local j=0
+        while j<i do
+            local rj=ri:unlink(j)
+            verify(rj,j,-1)
+            verify(ri,i-j,-1)
+            ri:link(rj)
+            verify(ri,i,-1)
+            j=j+1
+        end
+        i=i+1
+    end
+end
+
+function TestRingMoveEmptyRing()
+    local r=ring.Ring:new()
+    r:move(1)
+    verify(r,1,0)
+end
+
 os.exit(lu.LuaUnit.run())
