@@ -23,7 +23,9 @@ return function(runtime)
     -- 默认发送函数。正常使用必须替换。
     function M.DefaultSender(metronome, cmd)
     end
-
+    function M.DefaultDecoder(metronome,data)
+        return data
+    end
     function M.Metronome:new()
         local m = {
             _beats = 0,
@@ -34,7 +36,9 @@ return function(runtime)
             _paused = false,
             _resumeNext = false,
             _sender = self.DefaultSender,
-            _pipe = nil
+            _decoder=M.DefaultDecoder,
+            _pipe = nil,
+            params={}
         }
         setmetatable(m, self)
         return m
@@ -48,7 +52,10 @@ return function(runtime)
         self._pipe = p
         return self
     end
-
+    function M.Metronome:WithDecoder(d)
+        self._decoder = d
+        return self
+    end
     function M.Metronome:WithTimer(t)
         self._timer = t;
         return self
@@ -170,7 +177,7 @@ return function(runtime)
             return
         end
         for index, value in ipairs(cmds) do
-            if type(cmds) ~= 'function' then
+            if type(value) ~= 'function' then
                 local t = self:getTime()
                 self._sent:pushBack(t)
                 self:_sender(value)
@@ -216,6 +223,9 @@ return function(runtime)
     end
 
     function M.Metronome:_append(cmds, grouped, insert)
+        for index, value in ipairs(cmds) do
+            cmds[index]=self._decoder(self,value)
+        end
         if (grouped) then
             if insert then
                 self._queue:pushFront(cmds)
