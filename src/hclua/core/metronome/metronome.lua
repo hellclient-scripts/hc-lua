@@ -24,10 +24,6 @@ return function(runtime)
     function M.DefaultSender(metronome, cmd)
     end
 
-    function M.Metronome:getTime()
-        return self:_timer()
-    end
-
     function M.Metronome:new()
         local m = {
             _beats = 0,
@@ -42,6 +38,15 @@ return function(runtime)
         }
         setmetatable(m, self)
         return m
+    end
+
+    function M.Metronome:getTime()
+        return self:_timer()
+    end
+
+    function M.Metronome:WithPipe(p)
+        self._pipe = p
+        return self
     end
 
     function M.Metronome:WithTimer(t)
@@ -89,9 +94,6 @@ return function(runtime)
     end
 
     function M.Metronome:full()
-        if offset == nil then
-            offset = 0
-        end
         local t = self:getTime()
         local b = self:getBeats()
         self.sent = list.new()
@@ -111,11 +113,12 @@ return function(runtime)
             i = i + 1
         end
     end
+
     function M.Metronome:wait(offset)
         if offset == nil then
             offset = 0
         end
-        local t = self:getTime()-self:getTick()+offset
+        local t = self:getTime() - self:getTick() + offset
         local b = self:getBeats()
         local i = 0
         while i < b do
@@ -123,6 +126,7 @@ return function(runtime)
             i = i + 1
         end
     end
+
     function M.Metronome:pause()
         self._paused = true
     end
@@ -199,20 +203,36 @@ return function(runtime)
     end
 
     function M.Metronome:send(cmd)
+        if type(cmd) == 'function' then
+            return
+        end
+        if self._pipe ~= nil then
+            self._pipe:send(cmd)
+            return
+        end
         local t = self:getTime()
         self._sent:pushBack(t)
         self:_sender(cmd)
     end
 
-    function M.Metronome:_append(cmds, grouped)
+    function M.Metronome:_append(cmds, grouped, insert)
         if (grouped) then
-            self._queue:pushBack(cmds)
-        else
-            for index, value in ipairs(cmds) do
-                local cmd = {}
-                table.insert(cmd, value)
-                self._queue:pushBack(cmd)
+            if insert then
+                self._queue:pushFront(cmds)
+            else
+                self._queue:pushBack(cmds)
             end
+        else
+            local newcmds=list.new()
+            for index, value in ipairs(cmds) do
+                newcmds:pushBack({value})
+            end
+            if insert then
+                self._queue:pushFrontList(newcmds)
+            else
+                self._queue:pushBackList(newcmds)
+            end
+
         end
     end
 
@@ -235,7 +255,12 @@ return function(runtime)
     end
 
     function M.Metronome:push(cmds, grouped)
-        self:_append(cmds, grouped)
+        self:_append(cmds, grouped,false)
+        self:play()
+    end
+
+    function M.Metronome:insert(cmds, grouped)
+        self:_append(cmds, grouped,true)
         self:play()
     end
 
