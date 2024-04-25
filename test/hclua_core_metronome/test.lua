@@ -353,7 +353,7 @@ function TestPipe()
     
 end
 
-local function asssertShouldNotExeuted()
+local function assertShouldNotExeuted()
     lu.assertEquals(true,false)
 end
 function TestDecoder()
@@ -369,7 +369,7 @@ function TestDecoder()
         if type(data)=='string' then
             if string.sub(data,1,6)=='#wait ' then
                 return function (metronome)
-                    metronome.wait(string.sub(data,7)-0)
+                    metronome:wait(string.sub(data,7)-0)
                 end
             end
         end
@@ -391,7 +391,28 @@ function TestDecoder()
     lu.assertEquals(s:toString(), '1;2')
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
-    t:reset()
+    s:reset()
     m:reset()
+    m:push({'1','#wait 1000','2'})
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 0)
+    lu.assertEquals(formatQueue(m), '2')
+    t:sleep(501)
+    m:play()
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 0)
+    lu.assertEquals(formatQueue(m), '2')
+    t:sleep(1001-501)
+    m:play()
+    lu.assertEquals(s:toString(), '1;2')
+    lu.assertEquals(m:space(), 3)
+    lu.assertEquals(formatQueue(m), '')
+    s:reset()
+    m:reset()
+    m:push({'1',assertShouldNotExeuted,'2'},true)
+    lu.assertEquals(s:toString(), '1;2')
+    lu.assertEquals(m:space(), 2)
+    lu.assertEquals(formatQueue(m), '')
+
 end
 os.exit(lu.LuaUnit.run())

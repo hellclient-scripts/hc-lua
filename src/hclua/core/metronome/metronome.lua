@@ -7,7 +7,7 @@ return function(runtime)
 
     -- 默认时钟,测试时可替换为测试时钟
     function M.DefaultTimer()
-        return os.clock
+        return os.clock()*1000
     end
 
     -- 默认每节拍指令数,未设置或者设置小与等于0时使用该值。
