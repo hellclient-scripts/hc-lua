@@ -3,7 +3,8 @@ local runtime = dofile('../../src/hclua/runtime/runtime.lua')
 runtime.Path = '../../src/hclua/'
 local rt = runtime.Runtime:new()
 local metronome = rt:requireModule('core/metronome/metronome.lua')
-
+-- 测试用发送器
+-- 已发送内容存放于sent属性内
 local sender = {}
 sender.__index = sender
 
@@ -14,7 +15,8 @@ function sender:new()
     setmetatable(s, self)
     return s
 end
-
+-- 实现数据接口
+-- 函数直接以[func]储存
 function sender:send(data)
     if type(data) == 'function' then
         table.insert(self.sent, '[func]')
@@ -23,14 +25,17 @@ function sender:send(data)
     end
 end
 
+-- 清空重置
 function sender:reset()
     self.sent = {}
 end
 
+-- 将已发送内容转换为分号拼接的字符串
 function sender:toString()
     return table.concat(self.sent, ';')
 end
 
+-- 测试用计时器
 local timer = {}
 timer.__index = timer
 function timer:new()
@@ -41,19 +46,18 @@ function timer:new()
     return t
 end
 
+-- 实现接口
 function timer:getTime()
     return self._time
 end
 
-function timer:withTime(t)
-    self._time = t
-    return self
-end
-
+-- 等待t单位的时间
 function timer:sleep(t)
     self._time = self._time + t
 end
 
+-- 格式化节拍器的待输出队列，便于比较
+-- 合并为以分号分割的字符串，函数替换为[func]
 local function formatQueue(m)
     local q = {}
     for index, value in ipairs(m:queue()) do
@@ -68,6 +72,7 @@ local function formatQueue(m)
     return table.concat(q, ';')
 end
 
+-- 测试新建节拍器，及基本设置
 function TestMetronomeNew()
     local m = metronome.new()
     lu.assertEquals(m:getBeats(), metronome.DefaultBeats())
@@ -84,6 +89,7 @@ function TestMetronomeNew()
 
 end
 
+-- 测试节拍器的标准机制
 function TestMetronomePlay()
     local t = timer:new()
     local s = sender:new()
@@ -96,6 +102,7 @@ function TestMetronomePlay()
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(m:space(), 4)
     lu.assertEquals(formatQueue(m), '')
+    -- 不分组数据
     m:push({ "1", "2", "3", "4" }, false)
     lu.assertEquals(s:toString(), '1;2;3;4')
     lu.assertEquals(formatQueue(m), '')
@@ -112,13 +119,16 @@ function TestMetronomePlay()
     m:play()
     lu.assertEquals(s:toString(), '1;2;3;4;5;6')
     lu.assertEquals(m:space(), 2)
+    -- 分组数据
     m:push({ "7", "8", "9" }, true)
     m:push({ "10", "11", "12", "13" }, true)
     m:push({ "15" })
     lu.assertEquals(s:toString(), '1;2;3;4;5;6')
     lu.assertEquals(formatQueue(m), '7;8;9;10;11;12;13;15')
     lu.assertEquals(m:space(), 2)
+    -- 按组输出
     t:sleep(501)
+    -- 需要play更新
     lu.assertEquals(m:space(), 4)
     m:play()
     lu.assertEquals(s:toString(), '1;2;3;4;5;6;7;8;9')
@@ -129,6 +139,7 @@ function TestMetronomePlay()
     lu.assertEquals(s:toString(), '1;2;3;4;5;6;7;8;9;10;11;12;13')
     lu.assertEquals(formatQueue(m), '15')
     lu.assertEquals(m:space(), 0)
+    -- send的直接插队输出
     m:send('14')
     lu.assertEquals(s:toString(), '1;2;3;4;5;6;7;8;9;10;11;12;13;14')
     lu.assertEquals(formatQueue(m), '15')
@@ -138,6 +149,7 @@ function TestMetronomePlay()
     lu.assertEquals(s:toString(), '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15')
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
+    -- 超过beats的指令组，必须在空节拍才能发送
     m:push({ '16', '17', '18', '19', '20' }, true)
     lu.assertEquals(s:toString(), '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15')
     lu.assertEquals(m:space(), 3)
@@ -163,10 +175,12 @@ function TestMetronomePlay()
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), 'a;b;c;d;e;f')
+    -- reset测试
     m:reset()
     lu.assertEquals(s:toString(), 'a;b;c;d')
     lu.assertEquals(m:space(), 0)
     lu.assertEquals(formatQueue(m), 'e;f')
+    -- discard测试
     m:discard()
     lu.assertEquals(s:toString(), 'a;b;c;d')
     lu.assertEquals(m:space(), 0)
@@ -176,7 +190,7 @@ function TestMetronomePlay()
     lu.assertEquals(m:space(), 4)
     lu.assertEquals(formatQueue(m), '')
 end
-
+-- 插入测试
 function TestMetronomeInsert()
     local t = timer:new()
     local s = sender:new()
@@ -210,6 +224,7 @@ function TestMetronomeInsert()
     lu.assertEquals(formatQueue(m), '')
 end
 
+-- 计时器填充测试
 function TestMetronomeFull()
     local t = timer:new()
     local s = sender:new()
@@ -252,6 +267,7 @@ function TestMetronomeFull()
     lu.assertEquals(m:space(), 2)
     lu.assertEquals(formatQueue(m), '')
     t:sleep(251)
+    -- 测试填充节拍
     m:fullTick()
     m:push({ "c", "d" })
     lu.assertEquals(s:toString(), 'a;b')
@@ -272,6 +288,7 @@ function TestMetronomeFull()
     lu.assertEquals(m:space(), 2)
     lu.assertEquals(formatQueue(m), '')
     t:sleep(251)
+    -- 测试完全填充
     m:full()
     m:push({ "g", "h" })
     lu.assertEquals(s:toString(), 'a;b;c;d;e;f')
@@ -303,6 +320,7 @@ function TestMetronomeFull()
     lu.assertEquals(s:toString(), 'A')
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
+    -- 小于tick填充
     m:wait(250)
     m:push({ 'B' })
     lu.assertEquals(s:toString(), 'A')
@@ -339,6 +357,7 @@ function TestMetronomeFull()
     lu.assertEquals(m:space(), 4)
     lu.assertEquals(formatQueue(m), '')
     m:push({ "C" })
+    -- 正常wait
     m:wait(1000)
     m:push({ "D" })
     lu.assertEquals(s:toString(), 'A;B;C')
@@ -355,7 +374,7 @@ function TestMetronomeFull()
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
 end
-
+-- 暂停/继续测试
 function TestPause()
     local t = timer:new()
     local s = sender:new()
@@ -367,6 +386,7 @@ function TestPause()
     m:withTick(500):withBeats(4)
     m:pause()
     lu.assertEquals(m:paused(), true)
+    -- pause不需要在运行状态也可使用
     m:pause()
     lu.assertEquals(m:paused(), true)
     m:push({"1","2","3","4","5","6"},false)
@@ -387,6 +407,7 @@ function TestPause()
     lu.assertEquals(s:toString(), '1;2;3;4;5;6')
     lu.assertEquals(m:space(), 2)
     lu.assertEquals(formatQueue(m), '')
+    -- resume不需要在暂停状态也可使用
     m:resume()
     lu.assertEquals(m:paused(), false)
     m:push({"7","8"},false)
@@ -403,6 +424,8 @@ function TestPause()
     m:discard()
     m:reset()
     s:reset()
+    
+    -- 单步测试
     m:pause()
     m:push({"a","b"},false)
     m:push({"c","d","e"},true)
@@ -454,9 +477,11 @@ function TestPause()
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
     
+    
     m:discard()
     m:reset()
     s:reset()
+    -- resumeNext在非paused状态可以使用，但无实际效果
     lu.assertEquals(m:paused(), false)
     m:resumeNext()
     m:push({'A','B'})
@@ -478,9 +503,12 @@ function TestPause()
     lu.assertEquals(m:space(), 0)
     lu.assertEquals(formatQueue(m), '')
 end
+-- 测试用函数，如果被执行会测试失败
 local function assertShouldNotExecuted()
     lu.assertEquals(true, false)
 end
+
+-- 管道转发测试
 function TestPipe()
     local t = timer:new()
     local s = sender:new()
@@ -490,6 +518,7 @@ function TestPipe()
     m._sender = function(metronome, data)
         s:send(data)
     end
+    -- 转发目标，只记录数据
     local s2 = sender:new()
     local m2 = metronome.new()
     m2:withTick(1):withBeats(9999)
@@ -498,16 +527,19 @@ function TestPipe()
         s2:send(data)
     end
     m:withPipe(m2)
+    -- 直接send测试
     m:send('a')
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(s2:toString(), 'a')
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '')
+    -- 标准流程测试
     m:push({'b','c'})
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(s2:toString(), 'a;b;c')
     lu.assertEquals(m:space(), 1)
     lu.assertEquals(formatQueue(m), '')
+    -- 函数不被转发测试
     m:push({assertShouldNotExecuted,'d'},true)
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(s2:toString(), 'a;b;c')
@@ -526,6 +558,7 @@ function TestPipe()
     lu.assertEquals(s2:toString(), 'a;b;c;d;e;f;g;h;i')
     lu.assertEquals(m:space(), 0)
     lu.assertEquals(formatQueue(m), '')
+    -- 取消转发测试
     m:withPipe(nil)
     m:reset()
     m:send('A')
@@ -540,7 +573,7 @@ function TestPipe()
     lu.assertEquals(formatQueue(m), '')
 end
 
-
+-- 接码测试
 function TestDecoder()
     local t = timer:new()
     local s = sender:new()
@@ -550,6 +583,7 @@ function TestDecoder()
     m._sender = function(metronome, data)
         s:send(data)
     end
+    -- 指定解码器，#wait 数字可以实现暂停xx秒，类似zmud #wait
     m:withDecoder(function(metronome, data)
         if type(data) == 'string' then
             if string.sub(data, 1, 6) == '#wait ' then
@@ -560,6 +594,7 @@ function TestDecoder()
         end
         return data
     end)
+    -- 函数测试
     m:push({ '1', function(metronome)
         metronome:wait(1000)
     end, '2' })
@@ -578,6 +613,7 @@ function TestDecoder()
     lu.assertEquals(formatQueue(m), '')
     s:reset()
     m:reset()
+    -- 转码测试
     m:push({ '1', '#wait 1000', '2' })
     lu.assertEquals(s:toString(), '1')
     lu.assertEquals(m:space(), 0)
@@ -594,6 +630,7 @@ function TestDecoder()
     lu.assertEquals(formatQueue(m), '')
     s:reset()
     m:reset()
+    -- 函数在按组发送失效测试
     m:push({ '1', assertShouldNotExecuted, '2' }, true)
     lu.assertEquals(s:toString(), '1;2')
     lu.assertEquals(m:space(), 2)
@@ -601,6 +638,7 @@ function TestDecoder()
     s:reset()
     m:reset()
     m:full()
+    -- 函数在发送前不失效
     m:push({ '1', assertShouldNotExecuted, '2' }, true)
     lu.assertEquals(s:toString(), '')
     lu.assertEquals(m:space(), 0)
@@ -613,6 +651,7 @@ function TestDecoder()
     lu.assertEquals(s:toString(), '[func]')
     s:reset()
     m:reset()
+    -- send指令不发送函数测试
     m:send(function ()end)
     lu.assertEquals(s:toString(), '')
 
