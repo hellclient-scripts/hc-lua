@@ -48,20 +48,20 @@ return function(runtime)
         return self:_timer()
     end
 
-    function M.Metronome:WithPipe(p)
+    function M.Metronome:withPipe(p)
         self._pipe = p
         return self
     end
-    function M.Metronome:WithDecoder(d)
+    function M.Metronome:withDecoder(d)
         self._decoder = d
         return self
     end
-    function M.Metronome:WithTimer(t)
+    function M.Metronome:withTimer(t)
         self._timer = t;
         return self
     end
 
-    function M.Metronome:WithSender(t)
+    function M.Metronome:withSender(t)
         self._sender = t;
         return self
     end
@@ -171,14 +171,19 @@ return function(runtime)
                 return
             end
         end
+        local t = self:getTime()
         if self._pipe ~= nil then
             local grouped = (#cmds > 1)
-            self._pipe.push(cmds, grouped)
+            for index, value in ipairs(cmds) do
+                if type(value) ~= 'function' then
+                    self._sent:pushBack(t)
+                end
+            end
+            self._pipe:push(cmds, grouped)
             return
         end
         for index, value in ipairs(cmds) do
             if type(value) ~= 'function' then
-                local t = self:getTime()
                 self._sent:pushBack(t)
                 self:_sender(value)
             end
@@ -213,13 +218,14 @@ return function(runtime)
         if type(cmd) == 'function' then
             return
         end
+        local t = self:getTime()
+        self._sent:pushBack(t)
         if self._pipe ~= nil then
             self._pipe:send(cmd)
             return
+        else
+            self:_sender(cmd)
         end
-        local t = self:getTime()
-        self._sent:pushBack(t)
-        self:_sender(cmd)
     end
 
     function M.Metronome:_append(cmds, grouped, insert)
