@@ -10,3 +10,9 @@ Hclua.world:withTimer(getEpoch)
 Hclua.world.params['timer_id']=tempTimer(0.05,function ()
     Hclua.world:raiseEvent('world.raw_timer')
 end,true)
+Hclua.world._triggerDisabler=function (tag)
+    enableTrigger(tag)
+end
+Hclua.world._triggerEnabler=function (tag)
+    disableTrigger(tag)
+end

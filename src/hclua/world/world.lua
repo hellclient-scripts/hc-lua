@@ -16,7 +16,8 @@ return function(runtime)
     function M.DefaultTimer(data)
         return nil
     end
-
+    local function nop()
+    end
     function M.World:new()
         local world = {
             _eventBus={},
@@ -24,11 +25,19 @@ return function(runtime)
             _logger = M.DefaultLogger,
             _sender = M.DefaultSender,
             _timer=M.DefaultTimer,
+            _triggerDisabler=nop,
+            _triggerEnabler=nop,
             api={},
             params={}
         }
         setmetatable(world, self)
         return world
+    end
+    function M.World:disableTriggers(tag)
+        self._triggerDisabler(tag)
+    end
+    function M.World:enableTriggers(tag)
+        self._triggerEnabler(tag)
     end
     function M.World:withSender(s)
         self._sender=s

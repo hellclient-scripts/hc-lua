@@ -13,3 +13,9 @@ AddTimer('hclua_timer',0,0,0.1,'',timer_flag.Enabled or timer_flag.Temporary or 
 Hclua.world:withTimer(function ()
     return utils.timer()
 end)
+Hclua.world._triggerDisabler=function (tag)
+    EnableTriggers(tag,false)
+end
+Hclua.world._triggerEnabler=function (tag)
+    EnableTriggers(tag,true)
+end
