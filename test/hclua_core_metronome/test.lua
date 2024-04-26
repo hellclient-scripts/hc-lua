@@ -2,7 +2,7 @@ local lu = dofile('../../src/hclua/vendor/luaunit/luaunit.lua')
 local runtime = dofile('../../src/hclua/runtime/runtime.lua')
 runtime.Path = '../../src/hclua/'
 local rt = runtime.Runtime:new()
-local metronome = rt:requireModule('core/metronome/metronome.lua')
+local metronome = rt:requireModule('compontent/metronome/metronome.lua')
 -- 测试用发送器
 -- 已发送内容存放于sent属性内
 local sender = {}

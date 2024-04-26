@@ -7,17 +7,17 @@ return function(runtime)
 
     -- 默认时钟,测试时可替换为测试时钟
     function M.DefaultTimer()
-        return os.clock() * 1000
+        return os.time()
     end
 
     -- 默认拍子数
     function M.DefaultBeats()
-        return 10
+        return 6
     end
 
     -- 默认节奏
     function M.DefaultTick()
-        return 500
+        return 0.6
     end
 
     -- 默认发送函数。正常使用必须替换。

@@ -14,6 +14,7 @@ function M.Runtime:new()
         -- 模快空间
         _modules = {},
         _required = {},
+        world=nil
     }
     setmetatable(runtime, self)
     runtime.Utils = runtime:requireModule('runtime/utils.lua')
