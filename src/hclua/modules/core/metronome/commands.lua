@@ -30,6 +30,16 @@ return function(runtime)
             print(param)
         end
     end)
+    M.register('t+', function(metronome, param)
+        return function(metronome)
+            runtime.world:enableTriggers(param)
+        end
+    end)
+    M.register('t-', function(metronome, param)
+        return function(metronome)
+            runtime.world:disableTriggers(param)
+        end
+    end)
 
     runtime.world.api.metronomeCommands = M
     return M
