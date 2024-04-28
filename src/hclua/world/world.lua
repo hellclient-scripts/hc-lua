@@ -1,5 +1,6 @@
 return function(runtime)
     local M = {}
+    local eventbus=runtime:require('lib/eventbus/eventbus.lua')
     M.World = {}
     M.World.__index = M.World
     function M.DefaultPrinter(data)
@@ -20,7 +21,7 @@ return function(runtime)
     end
     function M.World:new()
         local world = {
-            _eventBus={},
+            eventBus=eventbus.new(),
             _printer = M.DefaultPrinter,
             _logger = M.DefaultLogger,
             _sender = M.DefaultSender,
@@ -56,39 +57,7 @@ return function(runtime)
     end
     function M.World:send(data)
         self._sender(data)
-    end    
-    function M.World:bindEvent(event,handler)
-        if self._eventBus[event]==nil then
-            self._eventBus[event]={}
-        end
-        table.insert(self._eventBus[event],(handler))
-    end
-    function M.World:raiseEvent(event,context)
-        if self._eventBus[event]==nil then
-            return
-        end
-        for i,v in ipairs(self._eventBus[event]) do
-            v(context)
-        end
-    end
-    function  M.World:unbindEvent(event,handler)
-        if self._eventBus[event]==nil then
-          return
-       end
-       local result={}
-       for i,v in ipairs(self._eventBus[event]) do
-            if v~=handler then
-                table.insert(result,v)
-            end
-        end
-        if (#result==0) then
-            self._eventBus[event]=nil
-        else
-            self._eventBus[event]=result
-        end
-       
-    end
-    
+    end        
     function M.new()
         return M.World:new()
     end
