@@ -136,6 +136,7 @@ return function(runtime)
     end
 
     -- 填充节拍器，之后的节奏时间内队列会被阻塞，不发送指令
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:full()
         local t = self:_getTime()
         local b = self:getBeats()
@@ -145,11 +146,13 @@ return function(runtime)
             self._sent:pushBack(t)
             i = i + 1
         end
+        return self
     end
 
     -- 填充节奏，当前节奏视作节拍发送已满，直到现有节拍过期才能继续发送
     -- 与full的区别在于，对当前节拍内已经有发送过指令处理不同
     -- 当前发送过的指令会使得节拍器提早接触阻塞
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:fullTick()
         local t = self:_getTime()
         local b = self:getBeats()
@@ -158,11 +161,13 @@ return function(runtime)
             self._sent:pushBack(t)
             i = i + 1
         end
+        return self
     end
 
     -- 节拍器等待指定时间
     -- 传入的参数为单位时间，默认为0，节拍器会阻塞对应的时间
     -- 注意，如果传入的等待时间太小，已经发送的指令还为解除阻塞，则由本身逻辑确定还能发出多少拍子
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:wait(offset)
         if offset == nil then
             offset = 0
@@ -174,12 +179,14 @@ return function(runtime)
             self._sent:pushBack(t)
             i = i + 1
         end
+        return self
     end
 
     -- 部分填充，填充指定节拍，用于通过其他方式绕过节拍控制后对节奏做相应调整
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:hold(beats)
         if (beats <= 0) then
-            return
+            return self
         end
         local t = self:_getTime()
         self.sent = list.new()
@@ -188,14 +195,17 @@ return function(runtime)
             self._sent:pushBack(t)
             i = i + 1
         end
+        return self
     end
 
     -- 暂停节拍器
     -- 暂停后阻塞队列
     -- 不影响send方法
     -- 暂停中还能暂停，无实际作用
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:pause()
         self._paused = true
+        return self
     end
 
     -- 返回是否暂停
@@ -209,10 +219,12 @@ return function(runtime)
     -- 回复后取消暂停状态
     -- 工作状态中也能使用该指令，无实际作用
     -- 使用resume后，resumeNext的状态也会被重置
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:resume()
         self._paused = false
-        self._resumeNext=false
+        self._resumeNext = false
         self:play()
+        return self
     end
 
     -- 恢复并发送下一个指令
@@ -220,17 +232,23 @@ return function(runtime)
     -- 函数调用不记数,会执行函数并继续执行下一个指令组
     -- 如果需要在函数调用里中止resumeNext,需要手动调用stopResumeNext方法
     -- 工作状态中也能使用该指令，无实际作用
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:resumeNext()
         if self._paused then
             self._resumeNext = true
         end
         self:play()
+        return self
     end
+
     -- 取消resumeNext状态
     -- 用于resumeNext函数里停止下一个指令的执行
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:stopResumeNext()
         self._resumeNext = false
+        return self
     end
+
     function M.Metronome:_clean()
         local t = self:_getTime()
         local e = self._sent:front()
@@ -301,6 +319,7 @@ return function(runtime)
     -- 参数cmd为字符串，如传入函数不做任何操作
     -- 不受节拍器暂停和阻塞影响
     -- 会留下发送记录
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:send(cmd)
         if type(cmd) == 'function' then
             return
@@ -313,6 +332,7 @@ return function(runtime)
         else
             self:_sender(cmd)
         end
+        return self
     end
 
     function M.Metronome:_append(cmds, grouped, insert)
@@ -340,14 +360,18 @@ return function(runtime)
 
     -- 重置节拍器发送记录
     -- 注意，如果队列中还有未发送指令，会进行正常发送
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:reset()
         self._sent = list.new()
         self:play()
+        return self
     end
 
     -- 清除未发送的队列
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:discard()
         self._queue = list.new()
+        return self
     end
 
     -- 返回当前时间还能发送命令的数量
@@ -368,9 +392,11 @@ return function(runtime)
     -- 按组发送时，如果指令长度超过1,指令中的函数不会被执行。
     -- 按组发送时，必须在同一个节奏发出。如果当前节奏不够整个组输出，会阻塞队列
     -- 如果指令比节拍数还长，会在空节奏里，将全部指令输出，并阻塞队列
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:push(cmds, grouped)
         self:_append(cmds, grouped, false)
         self:play()
+        return self
     end
 
     -- 将指令插入队列最前方，队列接触阻塞时将优先发送
@@ -378,24 +404,29 @@ return function(runtime)
     function M.Metronome:insert(cmds, grouped)
         self:_append(cmds, grouped, true)
         self:play()
+        return self
     end
 
     -- 创建节拍器的别名
     function M.new()
         return M.Metronome:new()
     end
+
     -- 返回最后一个发送指令组
     function M.Metronome:last()
         return self._last
     end
+
     -- 将最后一个发送的指令组压入队伍最前方并尝试resumeNext
     -- 由于resumeNext也需要进行缓存处理，连续的resend可能导致只有第一个resend的指令被发送,会导致堆记多个指令在队列前方
+    -- 返回节拍器自身，方便链式调sss用
     function M.Metronome:resend()
         if self._last == nil then
             return
         end
         self:insert(self._last, true)
         self:resumeNext()
+        return self
     end
 
     return M
