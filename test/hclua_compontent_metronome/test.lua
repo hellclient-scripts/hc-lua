@@ -654,7 +654,13 @@ function TestDecoder()
     -- send指令不发送函数测试
     m:send(function ()end)
     lu.assertEquals(s:toString(), '')
+end
 
+function TestHold()
+    
+end
+function TestLast()
+    
 end
 
 os.exit(lu.LuaUnit.run())

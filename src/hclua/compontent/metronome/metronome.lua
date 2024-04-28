@@ -42,6 +42,7 @@ return function(runtime)
             _sender = self.DefaultSender,
             _decoder = M.DefaultDecoder,
             _pipe = nil,
+            _last={},
             params = {}
         }
         setmetatable(m, self)
@@ -224,6 +225,7 @@ return function(runtime)
                 return
             end
         end
+        self._last=cmds
         local t = self:_getTime()
         if self._pipe ~= nil then
             local grouped = (#cmds > 1)
