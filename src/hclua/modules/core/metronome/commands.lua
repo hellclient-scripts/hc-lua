@@ -46,6 +46,6 @@ return function(runtime)
         end
     end)
 
-    runtime.world.api.metronomeCommands = M
+    runtime._H.metronomeCommands = M
     return M
 end

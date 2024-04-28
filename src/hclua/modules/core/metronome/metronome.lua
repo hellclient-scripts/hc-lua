@@ -10,15 +10,15 @@ return function (runtime)
         end)
         return m
     end
-    runtime.world.api.newMetronome=new
-    runtime.world.api.installMetronome=function (m)
+    runtime._H.newMetronome=new
+    runtime._H.installMetronome=function (m)
         local binded=function ()
             m:play()
         end
         runtime.world.eventBus:bindEvent('world.raw_timer',binded)
         m.params['binded']=binded
     end
-    runtime.world.api.uninstallMetronome=function (m)
+    runtime._H.uninstallMetronome=function (m)
         runtime.world:unbindEvent('world.raw_timer',m.params['binded'])
     end
 end

@@ -1,50 +1,29 @@
 return function(runtime)
     runtime:requireModule('modules/core/metronome/metronome.lua')
     runtime:requireModule('modules/core/metronome/commands.lua')
-    local metronome = runtime.world.api.newMetronome()
-    metronome:withDecoder(runtime.world.api.metronomeCommands.decoder)
-    runtime.world.api.metronome = metronome
-    runtime.world.api.push = function(cmds, grouped)
-        runtime.world.api.metronome:push(cmds, grouped)
-    end
-    runtime.world.api.pause = function()
-        runtime.world.api.metronome:pause()
-    end
-    runtime.world.api.resume = function()
-        runtime.world.api.metronome:resume()
-    end
-    runtime.world.api.resumeNext = function()
-        runtime.world.api.metronome:resumeNext()
-    end
-    runtime.world.api.stopResumeNext = function()
-        runtime.world.api.metronome:resumeNext()
-    end
-    runtime.world.api.resend = function()
-        runtime.world.api.metronome:resend()
-    end
-    runtime.world.api.wait = function(data)
-        runtime.world.api.metronome:wait(data / 1000)
-    end
-    runtime.world.api.queue = function(data, bysemicolon, noresume)
-        runtime.world.api.metronome:discard()
-        if (not noresume) then
-            runtime.world.api.metronome:resume()
-        end
+    local metronome = runtime._H.newMetronome()
+    metronome:withDecoder(runtime._H.metronomeCommands.decoder)
+    runtime._H.sender = metronome
+    runtime._H.lines=function (data, bysemicolon)
         local sep
+        local result={}
         if bysemicolon then
             sep = '[^\r\n;]+'
         else
             sep = '[^\r\n]+'
         end
         for line in string.gmatch(data, sep) do
-            runtime.world.api.metronome:push({ line })
+            table.insert(result,line)
         end
+        return result
     end
-    runtime.world.api.discard = function()
-        runtime.world.api.metronome:discard()
+    runtime._H.queue = function(data,m)
+        if m==nil then
+            m=runtime._H.sender
+        end
+        m:discard()
+        m:push(runtime._H.lines(data))
+        return m
     end
-    runtime.world.api.send=function (data)
-        runtime.world.api.metronome:send(data)
-    end
-    runtime.world.api.installMetronome(metronome)
+    runtime._H.installMetronome(metronome)
 end

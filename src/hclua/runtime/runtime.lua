@@ -14,6 +14,7 @@ function M.Runtime:new()
         -- 模快空间
         _modules = {},
         _required = {},
+        _H={},
         world=nil
     }
     setmetatable(runtime, self)
