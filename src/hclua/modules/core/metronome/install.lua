@@ -13,6 +13,12 @@ return function (runtime)
     runtime.world.api.resume=function ()
         runtime.world.api.metronome:resume()
     end
+    runtime.world.api.resumeNext=function ()
+        runtime.world.api.metronome:resumeNext()
+    end
+    runtime.world.api.resend=function ()
+        runtime.world.api.metronome:resend()
+    end
     runtime.world.api.installMetronome(metronome)
 
 end

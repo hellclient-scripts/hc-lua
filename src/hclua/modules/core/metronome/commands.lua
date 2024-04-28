@@ -25,6 +25,11 @@ return function(runtime)
             metronome:pause()
         end
     end)
+    M.register('resume', function(metronome, param)
+        return function(metronome)
+            metronome:resume()
+        end
+    end)
     M.register('print', function(metronome, param)
         return function(metronome)
             print(param)

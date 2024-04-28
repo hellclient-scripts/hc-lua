@@ -200,6 +200,7 @@ return function(runtime)
 
     -- 返回是否暂停
     -- 暂停状态返回true,工作状态返回false
+    -- 使用暂停不会影响resumeNext状态
     function M.Metronome:paused()
         return self._paused
     end
@@ -207,19 +208,29 @@ return function(runtime)
     -- 恢复节拍器
     -- 回复后取消暂停状态
     -- 工作状态中也能使用该指令，无实际作用
+    -- 使用resume后，resumeNext的状态也会被重置
     function M.Metronome:resume()
         self._paused = false
+        self._resumeNext=false
         self:play()
     end
 
     -- 恢复并发送下一个指令
-    -- 使用该指令会发送一个指令组，但不影响暂停状态
+    -- 暂停状态下使用该指令会允许下一个指令组被发送，但不影响暂停状态
+    -- 函数调用不记数,会执行函数并继续执行下一个指令组
+    -- 如果需要在函数调用里中止resumeNext,需要手动调用stopResumeNext方法
     -- 工作状态中也能使用该指令，无实际作用
     function M.Metronome:resumeNext()
-        self._resumeNext = true
+        if self._paused then
+            self._resumeNext = true
+        end
         self:play()
     end
-
+    -- 取消resumeNext状态
+    -- 用于resumeNext函数里停止下一个指令的执行
+    function M.Metronome:stopResumeNext()
+        self._resumeNext = false
+    end
     function M.Metronome:_clean()
         local t = self:_getTime()
         local e = self._sent:front()
@@ -239,6 +250,7 @@ return function(runtime)
                 return
             end
         end
+        self._resumeNext = false
         self._last = cmds
         local t = self:_getTime()
         if self._pipe ~= nil then
@@ -278,7 +290,6 @@ return function(runtime)
                 end
             end
             self._queue:remove(e)
-            self._resumeNext = false
             self:_exec(cmds)
             if self._paused and not self._resumeNext then
                 return
@@ -373,16 +384,18 @@ return function(runtime)
     function M.new()
         return M.Metronome:new()
     end
-
+    -- 返回最后一个发送指令组
     function M.Metronome:last()
         return self._last
     end
-
+    -- 将最后一个发送的指令组压入队伍最前方并尝试resumeNext
+    -- 由于resumeNext也需要进行缓存处理，连续的resend可能导致只有第一个resend的指令被发送,会导致堆记多个指令在队列前方
     function M.Metronome:resend()
         if self._last == nil then
             return
         end
         self:insert(self._last, true)
+        self:resumeNext()
     end
 
     return M
