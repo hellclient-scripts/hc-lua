@@ -42,7 +42,7 @@ return function(runtime)
             _sender = self.DefaultSender,
             _decoder = M.DefaultDecoder,
             _pipe = nil,
-            _last={},
+            _last = {},
             params = {}
         }
         setmetatable(m, self)
@@ -176,6 +176,20 @@ return function(runtime)
         end
     end
 
+    -- 部分填充，填充指定节拍，用于通过其他方式绕过节拍控制后对节奏做相应调整
+    function M.Metronome:hold(beats)
+        if (beats <= 0) then
+            return
+        end
+        local t = self:_getTime()
+        self.sent = list.new()
+        local i = 0
+        while i < beats do
+            self._sent:pushBack(t)
+            i = i + 1
+        end
+    end
+
     -- 暂停节拍器
     -- 暂停后阻塞队列
     -- 不影响send方法
@@ -225,7 +239,7 @@ return function(runtime)
                 return
             end
         end
-        self._last=cmds
+        self._last = cmds
         local t = self:_getTime()
         if self._pipe ~= nil then
             local grouped = (#cmds > 1)
@@ -358,6 +372,17 @@ return function(runtime)
     -- 创建节拍器的别名
     function M.new()
         return M.Metronome:new()
+    end
+
+    function M.Metronome:last()
+        return self._last
+    end
+
+    function M.Metronome:resend()
+        if self._last == nil then
+            return
+        end
+        self:insert(self._last, true)
     end
 
     return M

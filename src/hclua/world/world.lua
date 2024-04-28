@@ -76,7 +76,7 @@ return function(runtime)
           return
        end
        local result={}
-       for i,v in ipairs(eventBus[event]) do
+       for i,v in ipairs(self._eventBus[event]) do
             if v~=handler then
                 table.insert(result,v)
             end

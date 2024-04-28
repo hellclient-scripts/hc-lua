@@ -655,9 +655,46 @@ function TestDecoder()
     m:send(function ()end)
     lu.assertEquals(s:toString(), '')
 end
-
+-- 测试占位
 function TestHold()
-    
+    local t = timer:new()
+    local s = sender:new()
+    local m = metronome.new()
+    m:withTick(500):withBeats(4)
+    m._timer = function() return t:getTime() end
+    m._sender = function(metronome, data)
+        s:send(data)
+    end
+    m:push({1})
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 3)
+    lu.assertEquals(formatQueue(m), '')
+    m:hold(-1)
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 3)
+    lu.assertEquals(formatQueue(m), '')
+    m:hold(0)
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 3)
+    lu.assertEquals(formatQueue(m), '')
+    m:hold(2)
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 1)
+    lu.assertEquals(formatQueue(m), '')
+    m:hold(2)
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 0)
+    lu.assertEquals(formatQueue(m), '')
+    -- 过填充不会影响之后的tick
+    m:push({2})
+    lu.assertEquals(s:toString(), '1')
+    lu.assertEquals(m:space(), 0)
+    lu.assertEquals(formatQueue(m), '2')
+    t:sleep(501)
+    m:play()
+    lu.assertEquals(s:toString(), '1;2')
+    lu.assertEquals(m:space(), 3)
+    lu.assertEquals(formatQueue(m), '')
 end
 function TestLast()
     
