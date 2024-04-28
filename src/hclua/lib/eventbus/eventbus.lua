@@ -22,6 +22,7 @@ end
 
 -- 解绑事件处理函数
 -- 解绑执行事件下所有绑定过的指定事件处理器
+-- event可以不存在
 function M.EventBus:unbindEvent(event, handler)
     if self._handlers[event] == nil then
         return
@@ -40,6 +41,7 @@ function M.EventBus:unbindEvent(event, handler)
 end
 
 -- 解绑某个事件所有的处理函数
+-- event可以不存在
 function M.EventBus:unbindAll(event)
     self._handlers[event] = nil
 end
@@ -50,6 +52,7 @@ function M.EventBus:reset()
 end
 
 -- 触发事件，并将传入的context上下文传递给每一个处理函数
+-- event可以不存在
 function M.EventBus:raiseEvent(event, context)
     if self._handlers[event] == nil then
         return

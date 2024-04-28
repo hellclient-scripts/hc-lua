@@ -71,6 +71,13 @@ function Test()
     e:raiseEvent('b',1)
     lu.assertEquals(data_1,11)
     lu.assertEquals(data_2,4)
+    -- 解绑无效处理函数
+    e:bindEvent('a',handler1)
+    e:unbindEvent('a',function ()
+    end)
+    e:raiseEvent('a',1)
+    lu.assertEquals(data_1,12)
+    lu.assertEquals(data_2,4)
 end
 
 os.exit(lu.LuaUnit.run())
