@@ -26,8 +26,10 @@ return function(runtime)
             _logger = M.DefaultLogger,
             _sender = M.DefaultSender,
             _timer=M.DefaultTimer,
-            _triggerDisabler=nop,
-            _triggerEnabler=nop,
+            _triggersDisabler=nop,
+            _triggersEnabler=nop,
+            _variableSetter=nop,
+            _variableGetter=nop,
             api={},
             params={}
         }
@@ -35,10 +37,10 @@ return function(runtime)
         return world
     end
     function M.World:disableTriggers(tag)
-        self._triggerDisabler(tag)
+        self._triggersDisabler(tag)
     end
     function M.World:enableTriggers(tag)
-        self._triggerEnabler(tag)
+        self._triggersEnabler(tag)
     end
     function M.World:withSender(s)
         self._sender=s
@@ -51,6 +53,12 @@ return function(runtime)
     end
     function M.World:print(data)
         self._printer(data)
+    end
+    function M.World:setVariable(name,data)
+        self._variableSetter(name,data)
+    end
+    function M.World:getVariable(name)
+        return self._variableGetter(name)
     end
     function M.World:log(data)
         self._logger(data)
