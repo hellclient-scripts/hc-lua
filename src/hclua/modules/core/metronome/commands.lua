@@ -46,6 +46,6 @@ return function(runtime)
         end
     end)
 
-    runtime._H.metronomeCommands = M
+    runtime.HC.metronomeCommands = M
     return M
 end

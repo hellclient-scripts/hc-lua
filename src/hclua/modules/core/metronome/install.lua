@@ -1,10 +1,10 @@
 return function(runtime)
     runtime:requireModule('modules/core/metronome/metronome.lua')
     runtime:requireModule('modules/core/metronome/commands.lua')
-    local metronome = runtime._H.newMetronome()
-    metronome:withDecoder(runtime._H.metronomeCommands.decoder)
-    runtime._H.sender = metronome
-    runtime._H.lines=function (data, bysemicolon)
+    local metronome = runtime.HC.newMetronome()
+    metronome:withDecoder(runtime.HC.metronomeCommands.decoder)
+    runtime.HC.sender = metronome
+    runtime.HC.lines=function (data, bysemicolon)
         local sep
         local result={}
         if bysemicolon then
@@ -17,13 +17,14 @@ return function(runtime)
         end
         return result
     end
-    runtime._H.queue = function(data,m)
+    runtime.HC.queue = function(data,m)
         if m==nil then
-            m=runtime._H.sender
+            m=runtime.HC.sender
         end
         m:discard()
-        m:push(runtime._H.lines(data))
+        m:resume()
+        m:push(runtime.HC.lines(data))
         return m
     end
-    runtime._H.installMetronome(metronome)
+    runtime.HC.installMetronome(metronome)
 end
