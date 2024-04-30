@@ -3,7 +3,7 @@ local runtime = require('hclua/runtime/runtime')
 runtime.Path = getMudletHomeDir() .. '/hclua/'
 Hclua = runtime.Runtime:new():withCharset('utf8'):withHostType('mudlet')
 
-local line = Hclua:requireModule('compontent/line/line.lua')
+local line = Hclua:requireModule('lib/line/line.lua')
 local world = Hclua:requireModule('world/world.lua')
 Hclua.world = world.new()
 Hclua.world:withSender(function(data)
