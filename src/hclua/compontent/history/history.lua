@@ -29,6 +29,7 @@ return function(runtime)
 
     function M.History:onLine(line)
         self._ring = self._ring:next():withValue(line)
+        self._eventbus:raiseEvent('line', line)
     end
 
     function M.History:flush()
@@ -65,8 +66,28 @@ return function(runtime)
                 break
             end
             r = r:prev()
-            table.insert(result, value)
+            table.insert(result, 1, value)
             count = count + 1
+        end
+        return result
+    end
+
+    function M.History:plainLines(lines)
+        local result = {}
+        if lines ~= nil then
+            for index, value in ipairs(lines) do
+                table.insert(result, value.Text)
+            end
+        end
+        return result
+    end
+
+    function M.History:shortLines(lines)
+        local result = {}
+        if lines ~= nil then
+            for index, value in ipairs(lines) do
+                table.insert(result, value:toShort())
+            end
         end
         return result
     end
@@ -101,12 +122,12 @@ return function(runtime)
     end
 
     function M.Recorder:onLine(line)
-        if self._lines.length < self._cap then
-            self._lines.pushBack(line)
-            if self._lines.length == self._cap then
+        if self._lines:len() < self._cap then
+            self._lines:pushBack(line)
+            if self._lines:len() == self._cap then
                 if self._onFull ~= nil then
                     self._onFull(self)
-                    self._onFull=nil
+                    self._onFull = nil
                 end
             end
         end
@@ -117,30 +138,34 @@ return function(runtime)
     end
 
     function M.Recorder:start(cap, onfull)
-        if cap == nil then
+        if cap == nil or cap < 1 then
             cap = 1
         end
+        self._cap = cap
         self._onFull = onfull
         self._lines = list.new()
     end
 
-    function M.Recorder:cap()
-        return self.cap
+    function M.Recorder:getCap()
+        return self._cap
     end
 
-    function M.Recorder:length()
-        return self._lines:length()
+    function M.Recorder:getLength()
+        return self._lines:len()
     end
+
     function M.Recorder:stop()
-        self._cap=0
-        self._onFull=nil
+        self._cap = 0
+        self._onFull = nil
     end
+
     function M.Recorder:running()
-        return self.cap<=self._lines.length
+        return self._cap > self._lines:len()
     end
+
     function M.Recorder:getLines()
         local result = {}
-        local e = self._lines.front()
+        local e = self._lines:front()
         while e ~= nil do
             table.insert(result, e:value())
             e = e:next()

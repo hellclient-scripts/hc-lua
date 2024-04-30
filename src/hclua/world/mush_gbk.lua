@@ -2,7 +2,7 @@ local runtime=require('hclua/runtime/runtime')
 runtime.Path=GetInfo(67)..'hclua/'
 Hclua=runtime.Runtime:new():withCharset('gbk'):withHostType('mushclient')
 local world=Hclua:requireModule('world/world.lua')
-Hclua.world=world.new()
+Hclua.world=world.new():install()
 Hclua.world:withSender(function (data)
     Send(data)
 end)

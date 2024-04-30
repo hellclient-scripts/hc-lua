@@ -23,33 +23,33 @@ return function(runtime)
     M.Line = {}
     M.Line.__index = M.Line
     -- 设置flag位，成功返回true,失败false
-    local function setflag(word,data)
-        local flag=tonumber('0x'..data)
-        if flag==nil or flag>16 or flag<0 then
+    local function setflag(word, data)
+        local flag = tonumber('0x' .. data)
+        if flag == nil or flag > 16 or flag < 0 then
             return false
         end
-        if flag>=8 then
-            word.Inverse=true
-            flag=flag-8
+        if flag >= 8 then
+            word.Inverse = true
+            flag = flag - 8
         end
-        if flag>=4 then
-            word.Blinking=true
-            flag=flag-4
+        if flag >= 4 then
+            word.Blinking = true
+            flag = flag - 4
         end
-        if flag>=2 then
-            word.Underlined=true
-            flag=flag-2
+        if flag >= 2 then
+            word.Underlined = true
+            flag = flag - 2
         end
-        if flag==1 then
-            word.Bold=true
+        if flag == 1 then
+            word.Bold = true
         end
         return true
     end
 
     M.Colors[''] = 0
-    M.ColorValues={}
+    M.ColorValues = {}
     for key, value in pairs(M.Colors) do
-        M.ColorValues[value]=key
+        M.ColorValues[value] = key
     end
     function M.Line:new()
         local line = {
@@ -79,69 +79,69 @@ return function(runtime)
     M.parseLine = function(data)
         local line = M.Line:new()
         local word
-        local index=1
-        local length=#data
-        while index<=length do
-            local char=string.sub(data,index,index)
+        local index = 1
+        local length = #data
+        while index <= length do
+            local char = string.sub(data, index, index)
             -- 转义
-            if char=='#' then
-                local left=length-index
-                if left<1 then
+            if char == '#' then
+                local left = length - index
+                if left < 1 then
                     -- 孤立的#
                     return nil
                 end
-                local next=string.sub(data,index+1,index+1)
-                if next=='#' then
-                    if word==nil then
+                local next = string.sub(data, index + 1, index + 1)
+                if next == '#' then
+                    if word == nil then
                         return nil
                     end
-                    index=index+1
-                    word.Text=word.Text..'#'
-                elseif left>3 and next=='0' then
+                    index = index + 1
+                    word.Text = word.Text .. '#'
+                elseif left > 3 and next == '0' then
                     -- #0AA0格式
-                    local fg=M.ColorValues[string.byte(string.sub(data,index+2,index+2))-65]
-                    local bg=M.ColorValues[string.byte(string.sub(data,index+3,index+3))-65]
-                    if fg==nil or bg==nil then
+                    local fg = M.ColorValues[string.byte(string.sub(data, index + 2, index + 2)) - 65]
+                    local bg = M.ColorValues[string.byte(string.sub(data, index + 3, index + 3)) - 65]
+                    if fg == nil or bg == nil then
                         -- 无效颜色
                         return nil
                     end
-                    if word~=nil then
+                    if word ~= nil then
                         line:pushWord(word)
                     end
-                    word=M.Word:new()
-                    word.Color=fg
-                    word.Background=bg
-                    if not setflag(word,string.sub(data,index+4,index+4)) then
+                    word = M.Word:new()
+                    word.Color = fg
+                    word.Background = bg
+                    if not setflag(word, string.sub(data, index + 4, index + 4)) then
                         -- flag无效
                         return nil
                     end
-                    index=index+4
-                elseif left>13 and next=='1' then
+                    index = index + 4
+                elseif left > 13 and next == '1' then
                     -- #1RRGGBBRRGGBB0格式
-                    if word~=nil then
+                    if word ~= nil then
                         line:pushWord(word)
                     end
-                    word=M.Word:new()
-                    word.Color='#'..string.sub(data,index+2,index+7)
-                    word.Background='#'..string.sub(data,index+8,index+13)
-                    if not setflag(word,string.sub(data,index+14,index+14)) then
+                    word = M.Word:new()
+                    word.Color = '#' .. string.sub(data, index + 2, index + 7)
+                    word.Background = '#' .. string.sub(data, index + 8, index + 13)
+                    if not setflag(word, string.sub(data, index + 14, index + 14)) then
                         -- flag无效
                         return nil
                     end
-                    index=index+14
-                else 
+                    index = index + 14
+                else
                     return nil
                 end
             else
                 -- 无效，应该都有样式开头
-                if word==nil then
+                if word == nil then
                     return nil
                 end
-                word.Text=word.Text..char
+                word.Text = word.Text .. char
             end
-            index=index+1
+            index = index + 1
         end
-        if word~=nil  then
+        if word ~= nil then
             line:appendWord(word)
         end
         return line
@@ -169,10 +169,12 @@ return function(runtime)
         setmetatable(word, self)
         return word
     end
+
     -- 转为简写格式
     function M.Word:toShort()
         return self:getShortStyle() .. self.Text:gsub('#', '##')
     end
+
     -- 将样式转为简写格式
     function M.Word:getShortStyle()
         local result = '#'
@@ -180,7 +182,7 @@ return function(runtime)
             result = result .. '1' .. string.sub(self.Color, 2)
         else
             result = result .. '0' .. string.char(65 + M.Colors[self.Color]) .. string.char(65 +
-            M.Colors[self.Background])
+                M.Colors[self.Background])
         end
         local flag = 0
         if self.Bold then
@@ -198,5 +200,6 @@ return function(runtime)
         result = result .. string.format('%01X', flag)
         return result
     end
+
     return M
 end
