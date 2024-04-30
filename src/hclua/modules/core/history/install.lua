@@ -4,4 +4,5 @@ return function(runtime)
     runtime.HC.eventBus:bindEvent('world.line',function (line)
         runtime.HC.history:onLine(line)
     end)
+    runtime.HC.recorder=runtime.HC.history:createRecorder()
 end
