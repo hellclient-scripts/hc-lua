@@ -7,7 +7,7 @@ Hclua.world:withSender(function (data)
     Send(data)
 end)
 Hclua.world.params['on_timer']=function ()
-    Hclua.world.eventBus:raiseEvent('world.raw_timer')    
+    Hclua.world.eventBus:raiseEvent('world.tick')    
 end
 AddTimer('hclua_timer',0,0,0.1,'',timer_flag.Enabled or timer_flag.Temporary or timer_flag.ActiveWhenClosed ,'Hclua.world.params.on_timer')
 Hclua.world:withTimer(function ()

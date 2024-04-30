@@ -15,10 +15,10 @@ return function (runtime)
         local binded=function ()
             m:play()
         end
-        runtime.world.eventBus:bindEvent('world.raw_timer',binded)
+        runtime.world.eventBus:bindEvent('world.tick',binded)
         m.params['binded']=binded
     end
     runtime.HC.uninstallMetronome=function (m)
-        runtime.world:unbindEvent('world.raw_timer',m.params['binded'])
+        runtime.world:unbindEvent('world.tick',m.params['binded'])
     end
 end
