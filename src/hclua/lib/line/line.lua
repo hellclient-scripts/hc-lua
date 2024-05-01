@@ -19,9 +19,7 @@ return function(runtime)
         BrightCyan = 15,
         BrightWhite = 16
     }
-    -- line类，标准化mud的line信息
-    M.Line = {}
-    M.Line.__index = M.Line
+
     -- 设置flag位，成功返回true,失败false
     local function setflag(word, data)
         local flag = tonumber('0x' .. data)
@@ -51,6 +49,10 @@ return function(runtime)
     for key, value in pairs(M.Colors) do
         M.ColorValues[value] = key
     end
+
+    -- line类，标准化mud的line信息
+    M.Line = {}
+    M.Line.__index = M.Line
     function M.Line:new()
         local line = {
             Words = {},
@@ -72,6 +74,42 @@ return function(runtime)
         local result = ''
         for index, value in ipairs(self.Words) do
             result = result .. value:toShort()
+        end
+        return result
+    end
+
+    -- 获取子行
+    function M.Line:slice(start, length)
+        if start == nil then
+            start = 1
+        end
+        if start < 1 then
+            return nil
+        end
+        if length == nil then
+            length = 1
+        end
+        if length < 1 then
+            return nil
+        end
+        local skip = start - 1
+        local result = M.Line:new()
+        for index, value in ipairs(self.Words) do
+            if #value.Text <= skip then
+                -- 跳过整个word
+                skip = skip - #value.Text
+            else
+                if skip + length > #value.Text then
+                    -- 部分裁切
+                    result:appendWord(value:copyStyle(string.sub(value.Text, skip+1)))
+                    length = length - (#value.Text - skip)
+                    skip = 0
+                else
+                    -- 全部切玩
+                    result:appendWord(value:copyStyle(string.sub(value.Text, skip+1, skip+length)))
+                    return result
+                end
+            end
         end
         return result
     end
@@ -173,6 +211,21 @@ return function(runtime)
     -- 转为简写格式
     function M.Word:toShort()
         return self:getShortStyle() .. self.Text:gsub('#', '##')
+    end
+
+    function M.Word:copyStyle(text)
+        if text == nil then
+            text = ''
+        end
+        local w = M.Word:new()
+        w.Text = text
+        w.Color = self.Color
+        w.Background = self.Background
+        w.Bold = self.Bold
+        w.Underlined = self.Underlined
+        w.Blinking = self.Blinking
+        w.Inverse = self.Inverse
+        return w
     end
 
     -- 将样式转为简写格式
