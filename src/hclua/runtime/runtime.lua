@@ -90,7 +90,11 @@ function M.Runtime:requireModule(path)
     end
     return self._required[path]
 end
-
+function M.Runtime:loadModules(list)
+    for index, value in ipairs(list) do
+        self:requireModule(value)
+    end
+end
 function M.Runtime:loaded(path)
     return self._required[path] ~= nil
 end
