@@ -25,3 +25,6 @@ end
 Hclua.world._variableGetter=function (name)
     return getVariable(name)
 end
+Hclua.HC.lineReady=function (fn)
+    fn()
+end

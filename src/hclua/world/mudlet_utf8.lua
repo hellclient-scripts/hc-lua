@@ -138,6 +138,10 @@ local function online()
         word.Text = text
         newline:appendWord(word)
     end
+    for index, value in ipairs(Hclua.world.params['_lineReady']) do
+        value()
+    end
+    Hclua.world.params['_lineReady']={}
     Hclua.world:onLine(newline)
 end
 
@@ -154,4 +158,8 @@ Hclua.world._variableGetter = function(name)
         return ''
     end
     return tostring(data)
+end
+Hclua.world.params['_lineReady']={}
+Hclua.HC.lineReady=function (fn)
+    table.insert(Hclua.world.params['_lineReady'],fn)
 end
