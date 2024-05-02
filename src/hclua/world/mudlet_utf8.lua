@@ -102,24 +102,19 @@ end
 createBuffer('hclua_line')
 local function online()
     local all = getCurrentLine()
+    local lineno=getLastLineNumber()
+    local length=utf8.len(all)
     selectCurrentLine()
-    copy()
-    clearWindow('hclua_line')
-    paste('hclua_line')
-    moveCursor('hclua_line',utf8.len(all), 0)
-    insertText('hclua_line',' ')
-    
+    moveCursor(length, lineno)
+    insertText(' ')
     local newline = line.Line:new()
-    if all == '' then
-        return
-    end
     local last = ''
     local text = ''
     local lastresult
-    for i = 0, utf8.len(all)-1, 1 do
-        moveCursor('hclua_line',i, 0)
-        selectSection('hclua_line',i, 1)
-        local result = getTextFormat('hclua_line')
+    for i = 0, length-1, 1 do
+        moveCursor(i, lineno)
+        selectSection(i, 1)
+        local result = getTextFormat()
         local format = hashformat(result)
         if format ~= last then
             if text ~= '' then
@@ -131,18 +126,22 @@ local function online()
             last = format
             lastresult=result
         end
-        text = text .. getSelection('hclua_line')
+        text = text .. getSelection()
     end
     if text ~= '' then
         local word = newword(lastresult)
         word.Text = text
         newline:appendWord(word)
     end
-    for index, value in ipairs(Hclua.world.params['_lineReady']) do
+    selectSection(length,1)
+    replace('')
+
+    Hclua.world:onLine(newline)
+    local callbacks=Hclua.world.params['_lineReady']
+    Hclua.world.params['_lineReady']={}
+    for index, value in ipairs(callbacks) do
         value()
     end
-    Hclua.world.params['_lineReady']={}
-    Hclua.world:onLine(newline)
 end
 
 Hclua.world.params['trigger_id'] = tempComplexRegexTrigger('', '.*', function()

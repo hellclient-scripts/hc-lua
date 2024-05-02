@@ -67,7 +67,9 @@ return function(runtime)
         self._sender(data)
     end        
     function M.World:onLine(line)
+        self.eventBus:raiseEvent('world.lineInit',line)
         self.eventBus:raiseEvent('world.line',line)
+        self.eventBus:raiseEvent('world.lineReady',line)
     end
     function M.World:install()
         runtime.HC.eventBus=self.eventBus
