@@ -99,7 +99,6 @@ local function hashformat(format)
     result = result .. flag
     return result
 end
-createBuffer('hclua_line')
 local function online()
     local all = getCurrentLine()
     local lineno=getLastLineNumber()
