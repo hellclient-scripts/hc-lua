@@ -156,3 +156,19 @@ Hclua.world.params['_lineReady']={}
 Hclua.HC.lineReady=function (fn)
     table.insert(Hclua.world.params['_lineReady'],fn)
 end
+
+Hclua.HC.isConnected=function ()
+   local host,port,connected=getConnectionInfo()
+   return connected 
+end
+
+Hclua.HC.connect=reconnect
+Hclua.HC.disconnect=disconnect
+
+registerAnonymousEventHandler("sysConnectionEvent", function ()
+    Hclua.world.eventBus:raiseEvent('world.connect')
+end)
+registerAnonymousEventHandler("sysDisconnectionEvent", function ()
+    Hclua.world.eventBus:raiseEvent('world.disconnect')
+end)
+
