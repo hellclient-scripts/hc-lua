@@ -28,7 +28,10 @@ return function(runtime)
     function M.DefaultDecoder(metronome, data)
         return data
     end
-
+    -- 默认转换函数。直接返回原指令
+    function M.DefaultConverter(metronome, data)
+        return data
+    end
     -- 创建新的节拍器
     function M.Metronome:new()
         local m = {
@@ -41,6 +44,7 @@ return function(runtime)
             _resumeNext = false,
             _sender = self.DefaultSender,
             _decoder = M.DefaultDecoder,
+            _converter=M.DefaultConverter,
             _pipe = nil,
             _last = {},
             params = {}
@@ -275,6 +279,7 @@ return function(runtime)
                 return
             end
         end
+        cmds=self._converter(self,cmds)
         self._resumeNext = false
         self._last = cmds
         local t = self:_getTime()
@@ -331,6 +336,7 @@ return function(runtime)
         if type(cmd) == 'function' then
             return
         end
+        cmds=self._converter(self,{cmd})
         local t = self:_getTime()
         self._sent:pushBack(t)
         if self._pipe ~= nil then
