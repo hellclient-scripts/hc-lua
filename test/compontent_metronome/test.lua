@@ -822,5 +822,23 @@ function TestResend()
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '1;1;1')
 end
+function TestQueue()
+    local t = timer:new()
+    local s = sender:new()
+    local m = metronome.new()
+    m:withTick(500):withBeats(4)
+    m._timer = function() return t:getTime() end
+    m._sender = function(metronome, data)
+        s:send(data)
+    end
+    m:full()
+    m:push({'1','2','3'},true)
+    m:push({'4','5','6'},true)
+    local result=m:queue()
+    lu.assertEquals(#result,2)
+    lu.assertEquals(table.concat(result[1],';'),'1;2;3')
+    lu.assertEquals(table.concat(result[2],';'),'4;5;6')
 
+    lu.assertEquals(table.concat(m:queue(true),';'),'1;2;3;4;5;6')
+end
 os.exit(lu.LuaUnit.run())

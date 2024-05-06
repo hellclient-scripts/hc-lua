@@ -123,13 +123,20 @@ return function(runtime)
 
     -- 返回节拍器队列中的指令
     -- 返回值为数组，每个值代表一个指令组
+    -- 如果plain参数为true,所有指令将被不分组的返回在一个数组里。方便打印查看
     -- 指令组内的值是有顺序的字符串或函数
     -- 多个指令指令组中的函数也会返回，但不会被发送
-    function M.Metronome:queue()
+    function M.Metronome:queue(plain)
         local q = {}
         local e = self._queue:front()
         while e ~= nil do
-            table.insert(q, e:value())
+            if plain then
+                for index, value in ipairs(e:value()) do
+                    table.insert(q, value)
+                end
+            else
+                table.insert(q, e:value())
+            end
             e = e:next()
         end
         return q
