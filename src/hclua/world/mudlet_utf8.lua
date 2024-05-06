@@ -75,8 +75,8 @@ local function hashformat(format)
     if format==nil then
         return result
     end
-    result = format.foreground[1] .. '.' .. format.foreground[2] .. '.' .. format.foreground[2] .. '.'
-    result = result .. format.background[1] .. '.' .. format.background[2] .. '.' .. format.background[2] .. '.'
+    result = format.foreground[1] .. '.' .. format.foreground[2] .. '.' .. format.foreground[3] .. '.'
+    result = result .. format.background[1] .. '.' .. format.background[2] .. '.' .. format.background[3] .. '.'
     local flag = 0
     if format.bold then
         flag = flag + 1
@@ -108,29 +108,24 @@ local function online()
     insertText(' ')
     local newline = line.Line:new()
     local last = ''
-    local text = ''
-    local lastresult
+    local lastword
     for i = 0, length-1, 1 do
         moveCursor(i, lineno)
         selectSection(i, 1)
         local result = getTextFormat()
         local format = hashformat(result)
         if format ~= last then
-            if text ~= '' then
-                local word = newword(lastresult)
-                word.Text = text
-                newline:appendWord(word)
+            local word=newword(result)
+            if lastword ~= nil then
+                newline:appendWord(lastword)
             end
-            text=''
+            lastword=word
             last = format
-            lastresult=result
         end
-        text = text .. getSelection()
+        lastword.Text = lastword.Text .. getSelection()
     end
-    if text ~= '' then
-        local word = newword(lastresult)
-        word.Text = text
-        newline:appendWord(word)
+    if lastword~=nil and lastword.Text ~= '' then
+        newline:appendWord(lastword)
     end
     selectSection(length,1)
     replace('')
