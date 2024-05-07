@@ -50,7 +50,7 @@ function M.Runtime:new()
     }
     setmetatable(runtime, self)
     runtime.HC.utils= runtime:requireModule('runtime/utils.lua')
-    runtime.commands=runtime:requireModule('../lib/commands/commands.lua').new(M.defaultCommand)
+    runtime.commands=runtime:require('lib/commands/commands.lua').new(M.defaultCommand)
     runtime.HC.exec=function (id,data)
         runtime.commands:exec(id,data)
     end
