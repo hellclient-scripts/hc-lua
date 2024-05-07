@@ -822,6 +822,7 @@ function TestResend()
     lu.assertEquals(m:space(), 3)
     lu.assertEquals(formatQueue(m), '1;1;1')
 end
+
 function TestQueue()
     local t = timer:new()
     local s = sender:new()
@@ -832,13 +833,62 @@ function TestQueue()
         s:send(data)
     end
     m:full()
-    m:push({'1','2','3'},true)
-    m:push({'4','5','6'},true)
-    local result=m:queue()
-    lu.assertEquals(#result,2)
-    lu.assertEquals(table.concat(result[1],';'),'1;2;3')
-    lu.assertEquals(table.concat(result[2],';'),'4;5;6')
+    m:push({ '1', '2', '3' }, true)
+    m:push({ '4', '5', '6' }, true)
+    local result = m:queue()
+    lu.assertEquals(#result, 2)
+    lu.assertEquals(table.concat(result[1], ';'), '1;2;3')
+    lu.assertEquals(table.concat(result[2], ';'), '4;5;6')
 
-    lu.assertEquals(table.concat(m:queue(true),';'),'1;2;3;4;5;6')
+    lu.assertEquals(table.concat(m:queue(true), ';'), '1;2;3;4;5;6')
 end
+
+function TestConverter()
+    local t = timer:new()
+    local s = sender:new()
+    local m = metronome.new()
+    m:withTick(500):withBeats(4)
+    m._timer = function() return t:getTime() end
+    m._sender = function(metronome, data)
+        s:send(data)
+    end
+    local decoded = false
+    local converted = false
+    m:withConverter(function(m, cmds)
+        if #cmds == 1 and cmds[1] == '#decoded' then
+            cmds[1] = "#converted"
+            converted = true
+        end
+        return cmds
+    end)
+    m:withDecoder(function(m, data)
+        decoded = true
+        if data == '#test' then
+            decoded = true
+            return '#decoded'
+        end
+        return data
+    end)
+    m:full()
+    m:push({ 'a','b','#test' })
+    lu.assertEquals(decoded, true)
+    lu.assertEquals(converted, false)
+    lu.assertEquals(decoded, true)
+    lu.assertEquals(formatQueue(m), 'a;b;#decoded')
+    lu.assertEquals(s:toString(), '')
+    t:sleep(501)
+    m:play()
+    lu.assertEquals(decoded, true)
+    lu.assertEquals(converted, true)
+    lu.assertEquals(formatQueue(m), '')
+    lu.assertEquals(s:toString(), 'a;b;#converted')
+    s:reset()
+    m:discard()
+    m:reset()
+    m:send('a')
+    m:send('#test')
+    m:send('#decoded')
+    lu.assertEquals(s:toString(), 'a;#test;#converted')
+end
+
 os.exit(lu.LuaUnit.run())

@@ -28,10 +28,12 @@ return function(runtime)
     function M.DefaultDecoder(metronome, data)
         return data
     end
+
     -- 默认转换函数。直接返回原指令
     function M.DefaultConverter(metronome, data)
         return data
     end
+
     -- 创建新的节拍器
     function M.Metronome:new()
         local m = {
@@ -44,7 +46,7 @@ return function(runtime)
             _resumeNext = false,
             _sender = self.DefaultSender,
             _decoder = M.DefaultDecoder,
-            _converter=M.DefaultConverter,
+            _converter = M.DefaultConverter,
             _pipe = nil,
             _last = {},
             params = {}
@@ -70,6 +72,16 @@ return function(runtime)
     -- 返回节拍器自身，方便链式调用
     function M.Metronome:withDecoder(d)
         self._decoder = d
+        return self
+    end
+
+    -- 设置解转换器
+    -- 转换器用于在队列之后，发送时对指令进行转换。
+    -- 一般用于在限制频率时，将多条指令当作一条指令进行计算。
+    -- 也可以用来触发发送指令时要处理的代码
+    -- 返回节拍器自身，方便链式调用
+    function M.Metronome:withConverter(d)
+        self._converter = d
         return self
     end
 
@@ -279,7 +291,7 @@ return function(runtime)
                 return
             end
         end
-        cmds=self._converter(self,cmds)
+        cmds = self._converter(self, cmds)
         self._resumeNext = false
         self._last = cmds
         local t = self:_getTime()
@@ -336,14 +348,15 @@ return function(runtime)
         if type(cmd) == 'function' then
             return
         end
-        cmds=self._converter(self,{cmd})
+        cmds = self._converter(self, { cmd })
         local t = self:_getTime()
-        self._sent:pushBack(t)
-        if self._pipe ~= nil then
-            self._pipe:send(cmd)
-            return
-        else
-            self:_sender(cmd)
+        for index, value in ipairs(cmds) do
+            self._sent:pushBack(t)
+            if self._pipe ~= nil then
+                self._pipe:send(value)
+            else
+                self:_sender(value)
+            end            
         end
         return self
     end
