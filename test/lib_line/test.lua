@@ -158,5 +158,22 @@ function TestSlice()
     lu.assertEquals(li2:toShort(),word4:copyStyle('hi'):toShort())
     
 end
-
+-- 测试同样式单词合并
+function TestAppend()
+    local li=line.Line:new()
+    local word=line.Word:new()
+    word.Text='a'
+    word.Color='Red'
+    local word2=line.Word:new()
+    word2.Text='b'
+    word2.Color='Green'
+    word2.Bold=true
+    local word3=word2:copyStyle('c')
+    li:appendWord(word):appendWord(word2):appendWord(word3)
+    lu.assertEquals(li.Text,'abc')
+    lu.assertEquals(#li.Words,2)
+    lu.assertEquals(li.Words[1]:toShort(),word:toShort())
+    lu.assertEquals(li.Words[2].Text,'bc')
+    lu.assertEquals(li.Words[2]:getShortStyle(),word2:getShortStyle())
+end
 os.exit( lu.LuaUnit.run() )

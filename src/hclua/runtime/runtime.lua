@@ -1,11 +1,42 @@
 -- 运行时类
 -- 代码的基础，所有相关的代码都放在运行时内，避免污染环境
 local M = {}
+-- 大版本
+M.versionMajor=0
+-- 子版本
+M.versionMinor=20240507
+-- 补丁
+M.versionPatch=0
+
+-- 字符串格式的版本
+function M.version()
+    return M.versionMajor..'.'..M.versionMinor..'.'..M.versionPatch
+end
+
+function M.defaultCommand(cmd,data)
+    print('Hc-lua version '..M.version()..'\n')
+    print('Command ['..cmd..'] not registered.\n' )
+end
+-- 判断当前版本是否比指定的版本要早
+-- 用于自定义子模块做兼容性设置
+function M.beforeVersion(major,minor,patch)
+    if major==nil or major<M.versionMajor then
+        return true
+    end
+    if minor==nil or minor<M.versionMinor then
+        return true
+    end
+    if patch==nil or patch<M.versionPatch then
+        return true
+    end
+    return false
+end
 M.Path = 'hclua/'
 M.Runtime = {}
 M.Runtime.__index = M.Runtime
 M.DefaultCharset = 'ansi'
 M.DefaultHostType = 'cli'
+
 function M.Runtime:new()
     local runtime = {
         -- 编码信息，定义整个环境的编码，默认ansi,实际使用应该为utf8或者gbk
@@ -18,7 +49,11 @@ function M.Runtime:new()
         world=nil
     }
     setmetatable(runtime, self)
-    runtime.Utils = runtime:requireModule('runtime/utils.lua')
+    runtime.HC.utils= runtime:requireModule('runtime/utils.lua')
+    runtime.commands=runtime:requireModule('../lib/commands/commands.lua').new(M.defaultCommand)
+    runtime.HC.exec=function (id,data)
+        runtime.commands:exec(id,data)
+    end
     return runtime
 end
 

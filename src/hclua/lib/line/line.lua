@@ -63,8 +63,16 @@ return function(runtime)
     end
 
     -- 向行中追加词组
+    -- 同样样式的单词会被合并
     function M.Line:appendWord(w)
         self.Text = self.Text .. w.Text
+        if #self.Words>0 then
+            local last=self.Words[#self.Words]
+            if last:getShortStyle()==w:getShortStyle() then
+                self.Words[#self.Words]=w:copyStyle(last.Text..w.Text)
+                return self
+            end
+        end
         table.insert(self.Words, w)
         return self
     end
