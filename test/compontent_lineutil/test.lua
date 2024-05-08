@@ -55,18 +55,61 @@ function TestMono()
     lu.assertEquals(result:toShort(), word:copyStyle('测b试'):toShort())
     -- 跨word
     result = lineutils.UTF8Mono(li, 3, 5)
-    lu.assertEquals(result:toShort(), word:copyStyle('测b试'):toShort()..word2:copyStyle('你'):toShort())
+    lu.assertEquals(result:toShort(), word:copyStyle('测b试'):toShort() .. word2:copyStyle('你'):toShort())
     result = lineutils.UTF8Mono(li, 2, 6)
-    lu.assertEquals(result:toShort(), word:copyStyle('测b试'):toShort()..word2:copyStyle('你'):toShort())
+    lu.assertEquals(result:toShort(), word:copyStyle('测b试'):toShort() .. word2:copyStyle('你'):toShort())
     -- 超长
     result = lineutils.UTF8Mono(li, 1, 13)
-    lu.assertEquals(result:toShort(), word:toShort()..word2:toShort())
+    lu.assertEquals(result:toShort(), word:toShort() .. word2:toShort())
     result = lineutils.UTF8Mono(li, 1, 33)
-    lu.assertEquals(result:toShort(), word:toShort()..word2:toShort())
+    lu.assertEquals(result:toShort(), word:toShort() .. word2:toShort())
     result = lineutils.UTF8Mono(li, 7, 33)
-    lu.assertEquals(result:toShort(),word2:toShort())
+    lu.assertEquals(result:toShort(), word2:toShort())
     result = lineutils.UTF8Mono(li, 33, 33)
-    lu.assertEquals(result:toShort(),'')
+    lu.assertEquals(result:toShort(), '')
+end
+
+function TestLines()
+    local lines = {}
+    local li = line.Line:new()
+    local word = line.Word:new()
+    word.Text = '测试1测试1测试1'
+    word.Color = 'Red'
+    li:appendWord(word)
+    table.insert(lines, li)
+    local li2 = line.Line:new()
+
+    local word2 = line.Word:new()
+    word2.Text = '测试2测试2'
+    word2.Color = 'Green'
+    li2:appendWord(word2)
+    table.insert(lines, li2)
+    local li3 = line.Line:new()
+    local word3 = line.Word:new()
+    word3.Text = '测试3'
+    word3.Color = 'Yellow'
+    li3:appendWord(word3)
+    table.insert(lines, li3)
+    lu.assertEquals(lineutils.combineLines(lines, true), word.Text .. word2.Text .. word3.Text)
+    lu.assertEquals(lineutils.combineLines(lines), word.Text .. '\n' .. word2.Text .. '\n' .. word3.Text)
+    lu.assertEquals(lineutils.combineLinesShort(lines, true), word:toShort() .. word2:toShort() .. word3:toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lines), word:toShort() .. '\n' .. word2:toShort() ..'\n' .. word3:toShort())
+
+    lu.assertEquals(lineutils.sliceLines(lines,0,1),nil)
+    lu.assertEquals(lineutils.sliceLines(lines,1,0),nil)
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.sliceLines(lines,7,1)),word:copyStyle('1'):toShort()..'\n'..word2:copyStyle('2'):toShort()..'\n'..word3:copyStyle('3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.sliceLines(lines,1,7)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort()..'\n'..word3:copyStyle('测试3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.sliceLines(lines,1,7,2)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.sliceLines(lines,1,14)),word:copyStyle('测试1测试1'):toShort()..'\n'..word2:copyStyle('测试2测试2'):toShort()..'\n'..word3:copyStyle('测试3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.sliceLines(lines,8,7)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort()..'\n'..'')
+
+    lu.assertEquals(lineutils.linesUTF8Mono(lines,0,1),nil)
+    lu.assertEquals(lineutils.linesUTF8Mono(lines,1,0),nil)
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.linesUTF8Mono(lines,5,1)),word:copyStyle('1'):toShort()..'\n'..word2:copyStyle('2'):toShort()..'\n'..word3:copyStyle('3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.linesUTF8Mono(lines,1,5)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort()..'\n'..word3:copyStyle('测试3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.linesUTF8Mono(lines,1,5,2)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.linesUTF8Mono(lines,1,10)),word:copyStyle('测试1测试1'):toShort()..'\n'..word2:copyStyle('测试2测试2'):toShort()..'\n'..word3:copyStyle('测试3'):toShort())
+    lu.assertEquals(lineutils.combineLinesShort(lineutils.linesUTF8Mono(lines,6,5)),word:copyStyle('测试1'):toShort()..'\n'..word2:copyStyle('测试2'):toShort()..'\n'..'')
 end
 
 os.exit(lu.LuaUnit.run())

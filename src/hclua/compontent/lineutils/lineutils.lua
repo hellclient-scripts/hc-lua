@@ -6,7 +6,7 @@ return function(runtime)
     function M.combineLinesShort(lines, nonewline)
         local result = {}
         for index, value in ipairs(lines) do
-            table.insert(result, value.toShort())
+            table.insert(result, value:toShort())
         end
         local sep
         if nonewline then
@@ -32,6 +32,12 @@ return function(runtime)
     end
 
     function M.sliceLines(lines, start, length, max)
+        if start~=nil and start<1 then
+            return nil
+        end
+        if length~=nil and length<1 then
+            return nil
+        end
         local count = #lines
         if max ~= nil and length > max then
             count = max
@@ -46,6 +52,12 @@ return function(runtime)
     end
 
     function M.linesUTF8Mono(lines, start, length, max)
+        if start~=nil and start<1 then
+            return nil
+        end
+        if length~=nil and length<1 then
+            return nil
+        end
         local count = #lines
         if max ~= nil and length > max then
             count = max
@@ -53,7 +65,7 @@ return function(runtime)
         local i = 1
         local result = {}
         while i <= count do
-            table.insert(result, M.sliceLineUTF8Mono(line[i], start, length))
+            table.insert(result, M.UTF8Mono(lines[i], start, length))
             i = i + 1
         end
         return result
