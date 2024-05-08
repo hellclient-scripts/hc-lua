@@ -71,27 +71,7 @@ return function(runtime)
         end
         return result
     end
-
-    function M.History:plainLines(lines)
-        local result = {}
-        if lines ~= nil then
-            for index, value in ipairs(lines) do
-                table.insert(result, value.Text)
-            end
-        end
-        return result
-    end
-
-    function M.History:shortLines(lines)
-        local result = {}
-        if lines ~= nil then
-            for index, value in ipairs(lines) do
-                table.insert(result, value:toShort())
-            end
-        end
-        return result
-    end
-
+    
     function M.History:createRecorder()
         return M.Recorder:new(self)
     end
