@@ -3,7 +3,7 @@ local runtime = require('hclua/runtime/runtime')
 runtime.Path = getMudletHomeDir() .. '/hclua/'
 Hclua = runtime.Runtime:new():withCharset('utf8'):withHostType('mudlet')
 
-local line = Hclua:requireModule('lib/line/line.lua')
+local linelib = Hclua:requireModule('lib/line/line.lua')
 local world = Hclua:requireModule('world/world.lua')
 Hclua.world = world.new():install()
 Hclua.world:withSender(function(data)
@@ -39,7 +39,7 @@ local colormap = {
     'White'
 }
 local function newword(format)
-    local w = line.Word:new()
+    local w = linelib.Word:new()
     if format ~= nil then
         local fg = nil
         for index, value in ipairs(colormap) do
@@ -72,7 +72,7 @@ local function newword(format)
 end
 local function hashformat(format)
     local result = ''
-    if format==nil then
+    if format == nil then
         return result
     end
     result = format.foreground[1] .. '.' .. format.foreground[2] .. '.' .. format.foreground[3] .. '.'
@@ -99,48 +99,54 @@ local function hashformat(format)
     result = result .. flag
     return result
 end
-local function online()
-    local all = getCurrentLine()
-    local lineno=getLastLineNumber()
-    local length=utf8.len(all)
+Hclua.world.params['online'] = function()
+    local lineno = getLastLineNumber()
+    local length = utf8.len(line)
     selectCurrentLine()
     moveCursor(length, lineno)
     insertText(' ')
-    local newline = line.Line:new()
+    local newline = linelib.Line:new()
     local last = ''
     local lastword
-    for i = 0, length-1, 1 do
+    for i = 0, length - 1, 1 do
         moveCursor(i, lineno)
         selectSection(i, 1)
         local result = getTextFormat()
         local format = hashformat(result)
         if format ~= last then
-            local word=newword(result)
+            local word = newword(result)
             if lastword ~= nil then
                 newline:appendWord(lastword)
             end
-            lastword=word
+            lastword = word
             last = format
         end
         lastword.Text = lastword.Text .. getSelection()
     end
-    if lastword~=nil and lastword.Text ~= '' then
+    if lastword ~= nil and lastword.Text ~= '' then
         newline:appendWord(lastword)
     end
-    selectSection(length,1)
+    selectSection(length, 1)
     replace('')
-
-    Hclua.world:onLine(newline)
-    local callbacks=Hclua.world.params['_lineReady']
-    Hclua.world.params['_lineReady']={}
+    Hclua.world.params['current_line']=newline
+    raiseEvent('hclua.online')
+end
+registerAnonymousEventHandler('hclua.online', function()
+    Hclua.world:onLine(Hclua.world.params['current_line'])
+    local callbacks = Hclua.world.params['_lineReady']
+    Hclua.world.params['_lineReady'] = {}
     for index, value in ipairs(callbacks) do
-        value()
+        value(Hclua.world.params['current_line'])
     end
+end)
+if (exists('hclua.online', 'trigger') == 0) then
+    permRegexTrigger('hclua.online', '', { '^.*$' }, [[Hclua.world.params['online']()]])
 end
 
-Hclua.world.params['trigger_id'] = tempComplexRegexTrigger('', '.*', function()
-    online()
-end, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil)
+-- Hclua.world.params['trigger_id'] = tempComplexRegexTrigger('', '.*', function()
+--     online()
+--     raiseEvent('hclua.online')
+-- end, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil)
 Hclua_Varibles = Hclua_Varibles or {}
 Hclua.world._variableSetter = function(name, value)
     Hclua_Varibles[name] = value
@@ -152,23 +158,27 @@ Hclua.world._variableGetter = function(name)
     end
     return tostring(data)
 end
-Hclua.world.params['_lineReady']={}
-Hclua.HC.lineReady=function (fn)
-    table.insert(Hclua.world.params['_lineReady'],fn)
+Hclua.world.params['_lineReady'] = {}
+-- Hclua.HC.lineReady = function(fn)
+--     table.insert(Hclua.world.params['_lineReady'], fn)
+-- end
+Hclua.HC.lineReady = function(fn)
+    fn()
 end
 
-Hclua.HC.isConnected=function ()
-   local host,port,connected=getConnectionInfo()
-   return connected 
+Hclua.HC.isConnected = function()
+    local host, port, connected = getConnectionInfo()
+    return connected
 end
 
-Hclua.HC.connect=reconnect
-Hclua.HC.disconnect=disconnect
+Hclua.HC.connect = reconnect
+Hclua.HC.disconnect = disconnect
 
-registerAnonymousEventHandler("sysConnectionEvent", function ()
+registerAnonymousEventHandler("sysConnectionEvent", function()
     Hclua.world.eventBus:raiseEvent('world.connect')
 end)
-registerAnonymousEventHandler("sysDisconnectionEvent", function ()
+registerAnonymousEventHandler("sysDisconnectionEvent", function()
     Hclua.world.eventBus:raiseEvent('world.disconnect')
 end)
 
+print('建议在触发设置界面将hclua.online触发移动至所有触发上方。')

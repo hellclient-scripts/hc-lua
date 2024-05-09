@@ -239,8 +239,8 @@ return function(runtime)
     -- 将样式转为简写格式
     function M.Word:getShortStyle()
         local result = '#'
-        if #(self.Color) > 0 and self.Color[1] == '#' then
-            result = result .. '1' .. string.sub(self.Color, 2)
+        if (#(self.Color) > 0 and self.Color[1] == '#') or (#(self.Background)>0 and self.Background[1]=='#') then
+            result = result .. '1' .. string.sub(self.Color, 2)..string.sub(self.Background, 2)
         else
             result = result .. '0' .. string.char(65 + M.Colors[self.Color]) .. string.char(65 +
                 M.Colors[self.Background])
