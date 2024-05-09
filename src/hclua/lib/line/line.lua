@@ -66,10 +66,10 @@ return function(runtime)
     -- 同样样式的单词会被合并
     function M.Line:appendWord(w)
         self.Text = self.Text .. w.Text
-        if #self.Words>0 then
-            local last=self.Words[#self.Words]
-            if last:getShortStyle()==w:getShortStyle() then
-                self.Words[#self.Words]=w:copyStyle(last.Text..w.Text)
+        if #self.Words > 0 then
+            local last = self.Words[#self.Words]
+            if last:getShortStyle() == w:getShortStyle() then
+                self.Words[#self.Words] = w:copyStyle(last.Text .. w.Text)
                 return self
             end
         end
@@ -109,12 +109,12 @@ return function(runtime)
             else
                 if skip + length > #value.Text then
                     -- 部分裁切
-                    result:appendWord(value:copyStyle(string.sub(value.Text, skip+1)))
+                    result:appendWord(value:copyStyle(string.sub(value.Text, skip + 1)))
                     length = length - (#value.Text - skip)
                     skip = 0
                 else
                     -- 全部切玩
-                    result:appendWord(value:copyStyle(string.sub(value.Text, skip+1, skip+length)))
+                    result:appendWord(value:copyStyle(string.sub(value.Text, skip + 1, skip + length)))
                     return result
                 end
             end
@@ -162,19 +162,41 @@ return function(runtime)
                         return nil
                     end
                     index = index + 4
-                elseif left > 13 and next == '1' then
+                elseif left > 5 and next == '1' then
                     -- #1RRGGBBRRGGBB0格式
                     if word ~= nil then
                         line:pushWord(word)
                     end
                     word = M.Word:new()
-                    word.Color = '#' .. string.sub(data, index + 2, index + 7)
-                    word.Background = '#' .. string.sub(data, index + 8, index + 13)
-                    if not setflag(word, string.sub(data, index + 14, index + 14)) then
+                    index = index + 2
+                    if string.sub(data, index, index) == '*' then
+                        local fg = M.ColorValues[string.byte(string.sub(data, index + 1, index + 1)) - 65]
+                        if fg == nil then
+                            -- 无效颜色
+                            return nil
+                        end
+                        word.Color = fg
+                        index = index + 2
+                    else
+                        word.Color = '#' .. string.sub(data, index, index + 5)
+                        index = index + 6
+                    end
+                    if string.sub(data, index, index) == '*' then
+                        local bg = M.ColorValues[string.byte(string.sub(data, index + 1, index + 1)) - 65]
+                        if bg == nil then
+                            -- 无效颜色
+                            return nil
+                        end
+                        word.Background = bg
+                        index = index + 2
+                    else
+                        word.Background = '#' .. string.sub(data, index, index + 5)
+                        index = index + 6
+                    end
+                    if not setflag(word, string.sub(data, index, index)) then
                         -- flag无效
                         return nil
                     end
-                    index = index + 14
                 else
                     return nil
                 end
@@ -239,11 +261,23 @@ return function(runtime)
     -- 将样式转为简写格式
     function M.Word:getShortStyle()
         local result = '#'
-        if (#(self.Color) > 0 and self.Color[1] == '#') or (#(self.Background)>0 and self.Background[1]=='#') then
-            result = result .. '1' .. string.sub(self.Color, 2)..string.sub(self.Background, 2)
+        if (#self.Color > 0 and  string.sub(self.Color,1,1) == '#') or (#self.Background > 0 and string.sub(self.Background,1,1) == '#') then
+            result = result .. '1'
+            local fg = M.Colors[self.Color]
+            if fg ~= nil then
+                result = result .. '*' .. string.char(65 + fg)
+            else
+                result = result .. string.sub(self.Color, 2)
+            end
+            local bg = M.Colors[self.Background]
+            if bg ~= nil then
+                result = result .. '*' .. string.char(65 + bg)
+            else
+                result = result .. string.sub(self.Background, 2)
+            end
         else
-            result = result .. '0' .. string.char(65 + M.Colors[self.Color]) .. string.char(65 +
-                M.Colors[self.Background])
+            result = result ..
+                '0' .. string.char(65 + M.Colors[self.Color]) .. string.char(65 + M.Colors[self.Background])
         end
         local flag = 0
         if self.Bold then

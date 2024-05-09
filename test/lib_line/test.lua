@@ -176,4 +176,62 @@ function TestAppend()
     lu.assertEquals(li.Words[2].Text,'bc')
     lu.assertEquals(li.Words[2]:getShortStyle(),word2:getShortStyle())
 end
+function TestShortColor()
+    local word=line.Word:new()
+    word.Text='a'
+    word.Color='Red'
+    word.Background='Green'
+    word.Bold=true
+    local short=word:toShort()
+    lu.assertEquals(string.sub(short,1,1),'#')
+    lu.assertEquals(string.sub(short,2,2),'0')
+    local wordparsed=line.parseLine(short).Words[1]
+    lu.assertEquals(word.Text,wordparsed.Text)
+    lu.assertEquals(word.Color,wordparsed.Color)
+    lu.assertEquals(word.Background,wordparsed.Background)
+    lu.assertEquals(word.Bold,wordparsed.Bold)
+
+    word=line.Word:new()
+    word.Text='a'
+    word.Color='#333333'
+    word.Background='Green'
+    word.Bold=true
+    short=word:toShort()
+    lu.assertEquals(string.sub(short,1,1),'#')
+    lu.assertEquals(string.sub(short,2,2),'1')
+    wordparsed=line.parseLine(short).Words[1]
+    lu.assertEquals(word.Text,wordparsed.Text)
+    lu.assertEquals(word.Color,wordparsed.Color)
+    lu.assertEquals(word.Background,wordparsed.Background)
+    lu.assertEquals(word.Bold,wordparsed.Bold)
+
+    word=line.Word:new()
+    word.Text='a'
+    word.Color='Red'
+    word.Background='#666666'
+    word.Bold=true
+    short=word:toShort()
+    lu.assertEquals(string.sub(short,1,1),'#')
+    lu.assertEquals(string.sub(short,2,2),'1')
+    wordparsed=line.parseLine(short).Words[1]
+    lu.assertEquals(word.Text,wordparsed.Text)
+    lu.assertEquals(word.Color,wordparsed.Color)
+    lu.assertEquals(word.Background,wordparsed.Background)
+    lu.assertEquals(word.Bold,wordparsed.Bold)
+
+    word=line.Word:new()
+    word.Text='a'
+    word.Color='#333333'
+    word.Background='#666666'
+    word.Bold=true
+    short=word:toShort()
+    lu.assertEquals(string.sub(short,1,1),'#')
+    lu.assertEquals(string.sub(short,2,2),'1')
+    wordparsed=line.parseLine(short).Words[1]
+    lu.assertEquals(word.Text,wordparsed.Text)
+    lu.assertEquals(word.Color,wordparsed.Color)
+    lu.assertEquals(word.Background,wordparsed.Background)
+    lu.assertEquals(word.Bold,wordparsed.Bold)
+
+end
 os.exit( lu.LuaUnit.run() )
