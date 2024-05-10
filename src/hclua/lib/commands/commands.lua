@@ -40,25 +40,34 @@ M.commands.__index = M.commands
 function M.commands:new(defaultfn)
     local c={
         _items={},
+        _list={},
         _default=defaultfn,
     }
     setmetatable(c, self)
     return c
 end
+function M.commands:_removeFromList(id)
+    local result={}
+    for index, value in ipairs(self._list) do
+        if value._id~=id then
+            table.insert(result,value)
+        end
+    end
+    self._list=result
+end
 function M.commands:register(id,fn)
     local c=M.command:new(id,fn)
+    self:_removeFromList(id)
     self._items[id]=c
+    table.insert(self._list,c)
     return c
 end
 function M.commands:remove(id)
     self._items[id]=nil
+    self:_removeFromList(id)
 end
 function M.commands:list()
-    local result={}
-    for key, value in pairs(self._items) do
-        table.insert(result,value)
-    end
-    return result
+    return self._list
 end
 function M.commands:getCommand(id)
     return self._items[id]
