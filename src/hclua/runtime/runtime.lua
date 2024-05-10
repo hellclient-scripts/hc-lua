@@ -46,7 +46,8 @@ function M.Runtime:new()
         _modules = {},
         _required = {},
         HC={},
-        world=nil
+        world=nil,
+        Module=M
     }
     setmetatable(runtime, self)
     runtime.HC.utils= runtime:requireModule('runtime/utils.lua')
@@ -56,7 +57,6 @@ function M.Runtime:new()
     end
     return runtime
 end
-
 -- 返回环境字符编码
 function M.Runtime:getCharset()
     return self._charset
