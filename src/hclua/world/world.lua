@@ -30,7 +30,6 @@ return function(runtime)
             _triggersEnabler=nop,
             _variableSetter=nop,
             _variableGetter=nop,
-            api={},
             params={}
         }
         setmetatable(world, self)
