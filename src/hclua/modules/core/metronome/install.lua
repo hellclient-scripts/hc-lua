@@ -2,7 +2,6 @@ return function(runtime)
     runtime:requireModule('modules/core/metronome/metronome.lua')
     runtime:requireModule('modules/core/metronome/commands.lua')
     local metronome = runtime.HC.newMetronome()
-    metronome:withDecoder(runtime.HC.metronomeCommands.decoder)
     runtime.HC.sender = metronome
     runtime.HC.lines=function (data, bysemicolon)
         local sep
