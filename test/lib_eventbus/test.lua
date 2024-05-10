@@ -79,5 +79,30 @@ function Test()
     lu.assertEquals(data_1,12)
     lu.assertEquals(data_2,4)
 end
+function TestForward()
+    local result=''
+    local e=eventbus.new()
+    local function handler1(data)
+        result=result..'.a.'..data
+    end
+    local function forward1(event,data)
+        result=result..'.c.'..event..'.'..data
+    end
+    local function forward2(event,data)
+        result=result..'.d.'..event..'.'..data
+    end
+    e:bindEvent('A',handler1)
+    e:bindForward(forward1)
+    e:bindForward(forward2)
+    e:raiseEvent('A',1)
+    lu.assertEquals(result,'.a.1.c.A.1.d.A.1')
+    result=''
+    e:raiseEvent('not exists',1)
+    lu.assertEquals(result,'.c.not exists.1.d.not exists.1')
+    result=''
+    e:unbindForward(forward1)
+    e:raiseEvent('A',1)
+    lu.assertEquals(result,'.a.1.d.A.1')
 
+end
 os.exit(lu.LuaUnit.run())

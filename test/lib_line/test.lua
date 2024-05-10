@@ -232,6 +232,5 @@ function TestShortColor()
     lu.assertEquals(word.Color,wordparsed.Color)
     lu.assertEquals(word.Background,wordparsed.Background)
     lu.assertEquals(word.Bold,wordparsed.Bold)
-
 end
 os.exit( lu.LuaUnit.run() )
