@@ -182,4 +182,4 @@ registerAnonymousEventHandler("sysDisconnectionEvent", function()
 end)
 
 print('建议在触发设置界面将hclua.online触发移动至所有触发上方。')
-print('建议将前景色和浅白色设为一致，背景色和浅黑色设为一致，如默认色彩配置即可。')
+print('建议将前景色和白色设为一致，背景色和黑色设为一致，如默认色彩配置即可。')
