@@ -72,7 +72,7 @@ HCLua在开发时注重低侵入性，尽量不影响原有代码的功能。一
 ## 特性
 
 
-[详情](../doc/features.md)
+[详情](doc/features.md)
 
 ## 可选模块
 
@@ -102,3 +102,5 @@ metronome模块的功能包括
 ## 文档
 
 * [快速上手](doc/quickstart.md)
+* [API一览](doc/api.md)
+* [事件清单](doc/events.md)
