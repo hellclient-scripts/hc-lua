@@ -54,7 +54,7 @@ end
 
 Hclua.world.params['on_line'] = function()
     local linescount = GetLinesInBufferCount()
-    local offset=0
+    local offset = 0
     -- 被wrap的行，上一行的newline是false
     -- 还需要排除Note和echo的用户输出
     while offset + linescount > 0 do
@@ -67,7 +67,7 @@ Hclua.world.params['on_line'] = function()
     local last = ''
     local lastword
     local result
-    for lineno = linescount+offset,linescount, 1 do
+    for lineno = linescount + offset, linescount, 1 do
         local styles = GetStyleInfo(lineno)
         for index, value in ipairs(styles) do
             result = hashstyle(value)
@@ -150,9 +150,9 @@ end
 Hclua.HC.lineReady = function(fn)
     fn()
 end
-Hclua.HC.isConnected=IsConnected
-Hclua.HC.connect=Connect
-Hclua.HC.disconnect=Disconnect
+Hclua.HC.isConnected = IsConnected
+Hclua.HC.connect = Connect
+Hclua.HC.disconnect = Disconnect
 Hclua.world.params['on_connect'] = function()
     Hclua.world.eventBus:raiseEvent('world.connect')
 end
@@ -161,16 +161,17 @@ Hclua.world.params['on_disconnect'] = function()
 end
 print('请在你脚本的connect事件中调用 Hclua.world.params.on_connect()')
 print('请在你脚本的disconnect事件中调用 Hclua.world.params.on_disconnect()')
-Hclua.world.params['on_alias'] = function(n,l,w)
-    print(w[2],w[4])
+Hclua.world.params['on_alias'] = function(n, l, w)
     Hclua.HC.exec(w[2] or '', w[4] or '')
 end
 
 
 AddTriggerEx('hclua_trigger', '^.*$', 'Hclua.world.params.on_line()',
     trigger_flag.Enabled + trigger_flag.KeepEvaluating + trigger_flag.RegularExpression + trigger_flag.Replace +
-    trigger_flag.Temporary, -1, 0, '', '',sendto.script,1)
+    trigger_flag.Temporary, -1, 0, '', '', sendto.script, 1)
 AddTimer('hclua_timer', 0, 0, 0.1, '', timer_flag.Enabled + timer_flag.Temporary + timer_flag.ActiveWhenClosed,
     'Hclua.world.params.on_timer')
 
-AddAlias('hclua_alias','^#hclua( (\\S+)(\\s+(.+))?)?$','',alias_flag.Enabled+alias_flag.RegularExpression + alias_flag.Replace +alias_flag.Temporary,'Hclua.world.params.on_alias')
+AddAlias('hclua_alias', '^#hclua( (\\S+)(\\s+(.+))?)?$', '',
+    alias_flag.Enabled + alias_flag.RegularExpression + alias_flag.Replace + alias_flag.Temporary,
+    'Hclua.world.params.on_alias')
