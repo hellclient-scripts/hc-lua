@@ -55,8 +55,8 @@ end
 Hclua.world.params['on_line'] = function()
     local linescount = GetLinesInBufferCount()
     local offset=0
-    -- è¢«wrapçš„è¡Œï¼Œä¸Šä¸€è¡Œçš„newlineæ˜¯false
-    -- è¿˜éœ€è¦æŽ’é™¤Noteå’Œechoçš„ç”¨æˆ·è¾“å‡º
+    -- ±»wrapµÄÐÐ£¬ÉÏÒ»ÐÐµÄnewlineÊÇfalse
+    -- »¹ÐèÒªÅÅ³ýNoteºÍechoµÄÓÃ»§Êä³ö
     while offset + linescount > 0 do
         if GetLineInfo(offset + linescount - 1, 3) or GetLineInfo(offset + linescount - 1, 4) or GetLineInfo(offset + linescount - 1, 5) then
             break
@@ -159,11 +159,18 @@ end
 Hclua.world.params['on_disconnect'] = function()
     Hclua.world.eventBus:raiseEvent('world.disconnect')
 end
-print('è¯·åœ¨ä½ è„šæœ¬çš„connectäº‹ä»¶ä¸­è°ƒç”¨ Hclua.world.params.on_connect()')
-print('è¯·åœ¨ä½ è„šæœ¬çš„disconnectäº‹ä»¶ä¸­è°ƒç”¨ Hclua.world.params.on_disconnect()')
+print('ÇëÔÚÄã½Å±¾µÄconnectÊÂ¼þÖÐµ÷ÓÃ Hclua.world.params.on_connect()')
+print('ÇëÔÚÄã½Å±¾µÄdisconnectÊÂ¼þÖÐµ÷ÓÃ Hclua.world.params.on_disconnect()')
+Hclua.world.params['on_alias'] = function(n,l,w)
+    print(w[2],w[4])
+    Hclua.HC.exec(w[2] or '', w[4] or '')
+end
+
 
 AddTriggerEx('hclua_trigger', '^.*$', 'Hclua.world.params.on_line()',
     trigger_flag.Enabled + trigger_flag.KeepEvaluating + trigger_flag.RegularExpression + trigger_flag.Replace +
     trigger_flag.Temporary, -1, 0, '', '',sendto.script,1)
 AddTimer('hclua_timer', 0, 0, 0.1, '', timer_flag.Enabled + timer_flag.Temporary + timer_flag.ActiveWhenClosed,
     'Hclua.world.params.on_timer')
+
+AddAlias('hclua_alias','^#hclua( (\\S+)(\\s+(.+))?)?$','',alias_flag.Enabled+alias_flag.RegularExpression + alias_flag.Replace +alias_flag.Temporary,'Hclua.world.params.on_alias')
