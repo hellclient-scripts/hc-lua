@@ -56,8 +56,10 @@ function M.Runtime:new()
     runtime.HC.utils = runtime:requireModule('runtime/utils.lua')
     runtime.commands = runtime:require('lib/commands/commands.lua').new(function(cmd, data)
         runtime:print('HCLua version ' .. M.version())
-        runtime:print('Command [' .. cmd .. '] not registered.')
-        runtime:print('Press #hclua help to get commands list.')
+        if (cmd ~= nil and cmd ~= '') then
+            runtime:print('Command [' .. cmd .. '] not registered.')
+        end
+        runtime:print('Press ' .. runtime.world:getCommandPrefix() .. 'help to get commands list.')
     end)
     runtime.commands:register('help', function(data)
         data = data or ''
@@ -69,7 +71,7 @@ function M.Runtime:new()
                 runtime:print('  ' .. value:id() .. ' : ' .. value:intro())
             end
             runtime:print('')
-            runtime:print('#hclua help [command] to show command help detail.')
+            runtime:print(runtime.world:getCommandPrefix() .. 'help [command] to show command help detail.')
             return
         end
         local cmd = runtime.commands:getCommand(data)

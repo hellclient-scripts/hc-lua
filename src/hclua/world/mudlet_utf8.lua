@@ -128,7 +128,7 @@ Hclua.world.params['online'] = function()
     end
     selectSection(length, 1)
     replace('')
-    Hclua.world.params['current_line']=newline
+    Hclua.world.params['current_line'] = newline
     raiseEvent('hclua.online')
 end
 registerAnonymousEventHandler('hclua.online', function()
@@ -180,6 +180,12 @@ end)
 registerAnonymousEventHandler("sysDisconnectionEvent", function()
     Hclua.world.eventBus:raiseEvent('world.disconnect')
 end)
+Hclua.world.params['on_alias'] = function()
+    Hclua.HC.exec(matches[3] or '', matches[5] or '')
+end
 
+if (exists('hclua.alias', 'alias') == 0) then
+    permAlias('hclua.alias', '', '^#hclua( (\\S+)(\\s+(.+))?)?$', [[Hclua.world.params['on_alias']()]])
+end
 print('建议在触发设置界面将hclua.online触发移动至所有触发上方。')
 print('建议将前景色和白色设为一致，背景色和黑色设为一致，如默认色彩配置即可。')

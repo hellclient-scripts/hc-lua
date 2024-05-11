@@ -22,6 +22,7 @@ return function(runtime)
     function M.World:new()
         local world = {
             eventBus=eventbus.new(),
+            _commandPrefix='#hclua ',
             _printer = M.DefaultPrinter,
             _logger = M.DefaultLogger,
             _sender = M.DefaultSender,
@@ -37,9 +38,18 @@ return function(runtime)
     end
     function M.World:disableTriggers(tag)
         self._triggersDisabler(tag)
+        return self
     end
     function M.World:enableTriggers(tag)
         self._triggersEnabler(tag)
+        return self
+    end
+    function M.World:getCommandPrefix()
+        return self._commandPrefix
+    end
+    function M.World:withCommandPrefix(p)
+        self._commandPrefix=p
+        return self
     end
     function M.World:withSender(s)
         self._sender=s
