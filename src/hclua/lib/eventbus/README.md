@@ -85,7 +85,8 @@ function forwardingHandler(eventkey,context){
       eventbus:bindForward(handler)
 ```
 
-## 解除
+## 解除转发
+
 将指定的转发处理函数出绑定队列里移除
 
 ```lua
