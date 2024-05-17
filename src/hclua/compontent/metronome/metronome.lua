@@ -174,7 +174,7 @@ return function(runtime)
 
     -- 填充节奏，当前节奏视作节拍发送已满，直到现有节拍过期才能继续发送
     -- 与full的区别在于，对当前节拍内已经有发送过指令处理不同
-    -- 当前发送过的指令会使得节拍器提早接触阻塞
+    -- 当前发送过的指令会使得节拍器提早解除阻塞
     -- 返回节拍器自身，方便链式调用
     function M.Metronome:fullTick()
         local t = self:_getTime()
@@ -425,7 +425,7 @@ return function(runtime)
         return self
     end
 
-    -- 将指令插入队列最前方，队列接触阻塞时将优先发送
+    -- 将指令插入队列最前方，队列解除阻塞时将优先发送
     -- 其他同push方法
     function M.Metronome:insert(cmds, grouped)
         self:_append(cmds, grouped, true)
