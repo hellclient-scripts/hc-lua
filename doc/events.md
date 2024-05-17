@@ -64,7 +64,7 @@
 
 ## core.stop 事件
 
-由hclua/modules/core/commands.lua发起
+由hclua/modules/core/commands/install.lua发起
 
 发起时间为用户输入#hclua stop指令后
 
@@ -73,3 +73,13 @@
 用途为提供一个通用的停止脚本工作运行的指令
 
 用户的自定义脚本可以通过响应本事件实现停止脚本运行的功能
+
+## core.metronome.sent 事件
+
+由hclua/modules/core/metronome/commands.lua发起
+
+发起时间为主节拍器发送成功调用Converter时
+
+参数为主节拍器
+
+用途为供在界面显示待发送的指令
