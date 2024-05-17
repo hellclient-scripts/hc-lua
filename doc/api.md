@@ -7,6 +7,6 @@
 * [line 游戏行信息库](../src/hclua/lib/line/README.md)
 
 ## component 组件
-* [history 历史行信息组组件](../src/hclua/component/history/README.md)
-* [lineutils 行信息工具组件](../src/hclua/component/history/README.md)
-* [metronome 节拍器限流器组件](../src/hclua/component/history/README.md)
+* [history 历史行信息组组件](../src/hclua/compontent/history/README.md)
+* [lineutils 行信息工具组件](../src/hclua/compontent/lineutils/README.md)
+* [metronome 节拍器限流器组件](../src/hclua/compontent/metronome/README.md)
