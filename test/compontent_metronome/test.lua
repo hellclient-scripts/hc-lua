@@ -857,6 +857,7 @@ function TestConverter()
     m:withConverter(function(m, cmds)
         if #cmds == 1 and cmds[1] == '#decoded' then
             cmds[1] = "#converted"
+            cmds[2]="#converted2"
             converted = true
         end
         return cmds
@@ -871,24 +872,27 @@ function TestConverter()
     end)
     m:full()
     m:push({ 'a','b','#test' })
-    lu.assertEquals(decoded, true)
+    lu.assertEquals(decoded, false)
     lu.assertEquals(converted, false)
-    lu.assertEquals(decoded, true)
-    lu.assertEquals(formatQueue(m), 'a;b;#decoded')
+    lu.assertEquals(formatQueue(m), 'a;b;#test')
     lu.assertEquals(s:toString(), '')
     t:sleep(501)
     m:play()
+    lu.assertEquals(formatQueue(m), '')
+    lu.assertEquals(m:space(),1)
     lu.assertEquals(decoded, true)
     lu.assertEquals(converted, true)
-    lu.assertEquals(formatQueue(m), '')
-    lu.assertEquals(s:toString(), 'a;b;#converted')
+    lu.assertEquals(s:toString(), 'a;b;#converted;#converted2')
+    -- 测试send
     s:reset()
     m:discard()
     m:reset()
     m:send('a')
+    -- decoder应该不对send起作用
     m:send('#test')
+    -- converter应该对send起作用
     m:send('#decoded')
-    lu.assertEquals(s:toString(), 'a;#test;#converted')
+    lu.assertEquals(s:toString(), 'a;#test;#converted;#converted2')
 end
 
 os.exit(lu.LuaUnit.run())

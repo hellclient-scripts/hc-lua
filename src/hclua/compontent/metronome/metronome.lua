@@ -189,7 +189,7 @@ return function(runtime)
 
     -- 节拍器等待指定时间
     -- 传入的参数为单位时间，默认为0，节拍器会阻塞对应的时间
-    -- 注意，如果传入的等待时间太小，已经发送的指令还为解除阻塞，则由本身逻辑确定还能发出多少拍子
+    -- 注意，如果传入的等待时间太小，已经发送的指令还未解除阻塞，则由本身逻辑确定还能发出多少拍子
     -- 返回节拍器自身，方便链式调用
     function M.Metronome:wait(offset)
         if offset == nil then
@@ -239,7 +239,7 @@ return function(runtime)
     end
 
     -- 恢复节拍器
-    -- 回复后取消暂停状态
+    -- 恢复后取消暂停状态
     -- 工作状态中也能使用该指令，无实际作用
     -- 使用resume后，resumeNext的状态也会被重置
     -- 返回节拍器自身，方便链式调用
@@ -285,31 +285,36 @@ return function(runtime)
     end
 
     function M.Metronome:_exec(cmds)
+        for index, value in ipairs(cmds) do
+            cmds[index] = self._decoder(self, value)
+        end
+        -- 只有单独的函数会被执行
         if #cmds == 1 then
             if type(cmds[1]) == 'function' then
                 cmds[1](self)
                 return
             end
         end
-        cmds = self._converter(self, cmds)
         self._resumeNext = false
         self._last = cmds
         local t = self:_getTime()
+        -- 分组内的函数部分被过滤
+        local filtered = {}
+        for index, value in ipairs(cmds) do
+            if type(value) ~= 'function' then
+                self._sent:pushBack(t)
+                table.insert(filtered, value)
+            end
+        end
+        -- converter不影响_sent
+        cmds = self._converter(self, filtered)
         if self._pipe ~= nil then
             local grouped = (#cmds > 1)
-            for index, value in ipairs(cmds) do
-                if type(value) ~= 'function' then
-                    self._sent:pushBack(t)
-                end
-            end
             self._pipe:push(cmds, grouped)
             return
         end
         for index, value in ipairs(cmds) do
-            if type(value) ~= 'function' then
-                self._sent:pushBack(t)
-                self:_sender(value)
-            end
+            self:_sender(value)
         end
     end
 
@@ -348,7 +353,7 @@ return function(runtime)
         if type(cmd) == 'function' then
             return
         end
-        cmds = self._converter(self, { cmd })
+        local cmds = self._converter(self, { cmd })
         local t = self:_getTime()
         for index, value in ipairs(cmds) do
             self._sent:pushBack(t)
@@ -356,15 +361,12 @@ return function(runtime)
                 self._pipe:send(value)
             else
                 self:_sender(value)
-            end            
+            end
         end
         return self
     end
 
     function M.Metronome:_append(cmds, grouped, insert)
-        for index, value in ipairs(cmds) do
-            cmds[index] = self._decoder(self, value)
-        end
         if (grouped) then
             if insert then
                 self._queue:pushFront(cmds)
@@ -386,6 +388,7 @@ return function(runtime)
 
     -- 重置节拍器发送记录
     -- 注意，如果队列中还有未发送指令，会进行正常发送
+    -- 如果需要彻底重置节拍器，应该先discard,再reset
     -- 返回节拍器自身，方便链式调用
     function M.Metronome:reset()
         self._sent = list.new()
@@ -439,12 +442,14 @@ return function(runtime)
     end
 
     -- 返回最后一个发送指令组
+    -- 不包括send指令发送的内容
     function M.Metronome:last()
         return self._last
     end
 
     -- 将最后一个发送的指令组压入队伍最前方并尝试resumeNext
     -- 由于resumeNext也需要进行缓存处理，连续的resend可能导致只有第一个resend的指令被发送,会导致堆记多个指令在队列前方
+    -- 不包括send指令发送的内容
     -- 返回节拍器自身，方便链式调用
     function M.Metronome:resend()
         if self._last == nil then
