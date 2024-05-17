@@ -445,7 +445,7 @@ return function(runtime)
 
     -- 将最后一个发送的指令组压入队伍最前方并尝试resumeNext
     -- 由于resumeNext也需要进行缓存处理，连续的resend可能导致只有第一个resend的指令被发送,会导致堆记多个指令在队列前方
-    -- 返回节拍器自身，方便链式调sss用
+    -- 返回节拍器自身，方便链式调用
     function M.Metronome:resend()
         if self._last == nil then
             return
