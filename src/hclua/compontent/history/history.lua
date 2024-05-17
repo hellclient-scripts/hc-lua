@@ -94,14 +94,14 @@ return function(runtime)
             _onFull = nil
         }
         r._binder = function(data)
-            r:onLine(data)
+            r:_onLine(data)
         end
         setmetatable(r, self)
         history._eventbus:bindEvent('line', r._binder)
         return r
     end
 
-    function M.Recorder:onLine(line)
+    function M.Recorder:_onLine(line)
         if self._lines:len() < self._cap then
             self._lines:pushBack(line)
             if self._lines:len() == self._cap then
