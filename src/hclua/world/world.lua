@@ -33,6 +33,8 @@ return function(runtime)
             _variableGetter=nop,
             _eventLineEnabler=nop,
             _eventTickEnabler=nop,
+            _userFileReader=nop,
+            _userFileWriter=nop,
             params={}
         }
         setmetatable(world, self)
@@ -82,7 +84,13 @@ return function(runtime)
     end
     function M.World:send(data)
         self._sender(data)
-    end        
+    end
+    function M.World:readUserFile(name)
+        return self._userFileReader(name)
+    end
+    function M.World:writeUserFile(name,data)
+        return self._userFileWriter(name,data)
+    end
     function M.World:onLine(line)
         self.eventBus:raiseEvent('world.lineInit',line)
         self.eventBus:raiseEvent('world.line',line)

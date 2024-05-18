@@ -175,12 +175,31 @@ Hclua.world._eventTickEnabler = function(enabled)
 end
 
 Hclua.world.params['_lineReady'] = {}
+
+Hclua.world._userFileReader=function (name)
+    local file=io.open(getMudletHomeDir()..'/user.'..name,'r')
+    if file==nil then
+        return nil
+    end
+    local result=file:read('*a')
+    io.close(file)
+    return result
+end
+Hclua.world._userFileWriter=function (name,data)
+    local file=io.open(getMudletHomeDir()..'/user.'..name,'w')
+    if file==nil then
+        return
+    end
+    file:write(data)
+    io.close(file)
+    return
+end
 -- Hclua.HC.lineReady = function(fn)
 --     table.insert(Hclua.world.params['_lineReady'], fn)
 -- end
-Hclua.HC.lineReady = function(fn)
-    fn()
-end
+-- Hclua.HC.lineReady = function(fn)
+--     fn()
+-- end
 
 Hclua.HC.isConnected = function()
     local host, port, connected = getConnectionInfo()
@@ -189,6 +208,8 @@ end
 
 Hclua.HC.connect = reconnect
 Hclua.HC.disconnect = disconnect
+
+Hclua.world.
 
 registerAnonymousEventHandler("sysConnectionEvent", function()
     Hclua.world.eventBus:raiseEvent('world.connect')

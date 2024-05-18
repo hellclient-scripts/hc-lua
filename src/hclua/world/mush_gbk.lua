@@ -153,9 +153,9 @@ end
 Hclua.world._eventTickEnabler = function(enabled)
     EnableTimer('hclua_timer', enabled == true)
 end
-Hclua.HC.lineReady = function(fn)
-    fn()
-end
+-- Hclua.HC.lineReady = function(fn)
+--     fn()
+-- end
 Hclua.HC.isConnected = IsConnected
 Hclua.HC.connect = Connect
 Hclua.HC.disconnect = Disconnect
