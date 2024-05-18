@@ -1,7 +1,7 @@
 if (Hclua ~= nil) then
   return
 end
-print('Loading...')
+print('Loading HCLua...')
 require('hclua/world/mudlet_utf8')
 Hclua:loadModules({
   -- 加载常用指令
@@ -15,11 +15,11 @@ Hclua:loadModules({
 })
 
 -- 是否开启line事件
-Hclua.World:enableEventLine(true)
+Hclua.world:enableEventLine(true)
 -- 是否开启tick事件
-Hclua.World:enableEventTick(true)
+Hclua.world:enableEventTick(true)
 -- 指令提示的前缀
-Hclua.World:withCommandPrefix('#hclua ')
+Hclua.world:withCommandPrefix('#hclua ')
 
-print('Loaded.')
+print('HCLua loaded.')
 print('HCLua version ' .. Hclua.Module.version() .. '\n')
