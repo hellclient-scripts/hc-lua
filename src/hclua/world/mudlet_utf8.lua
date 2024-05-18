@@ -158,6 +158,22 @@ Hclua.world._variableGetter = function(name)
     end
     return tostring(data)
 end
+
+Hclua.world._eventLineEnabler = function(enabled)
+    if enabled == true then
+        enableTrigger('hclua.online')
+    else
+        disableTrigger('hclua.online')
+    end
+end
+Hclua.world._eventTickEnabler = function(enabled)
+    if enabled == true then
+        enableTimer(Hclua.world.params['timer_id'])
+    else
+        disableTimer(Hclua.world.params['timer_id'])
+    end
+end
+
 Hclua.world.params['_lineReady'] = {}
 -- Hclua.HC.lineReady = function(fn)
 --     table.insert(Hclua.world.params['_lineReady'], fn)

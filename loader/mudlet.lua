@@ -13,5 +13,13 @@ Hclua:loadModules({
   -- 引用历史记录和记录器模块
   'modules/core/history/install.lua',
 })
+
+-- 是否开启line事件
+Hclua.World:enableEventLine(true)
+-- 是否开启tick事件
+Hclua.World:enableEventTick(true)
+-- 指令提示的前缀
+Hclua.World:withCommandPrefix('#hclua ')
+
 print('Loaded.')
 print('HCLua version ' .. Hclua.Module.version() .. '\n')

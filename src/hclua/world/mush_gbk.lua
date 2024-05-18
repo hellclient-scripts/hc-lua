@@ -147,6 +147,12 @@ end
 Hclua.world._variableGetter = function(name)
     return getVariable(name)
 end
+Hclua.world._eventLineEnabler = function(enabled)
+    EnableTrigger('hclua_trigger', enabled == true)
+end
+Hclua.world._eventTickEnabler = function(enabled)
+    EnableTimer('hclua_timer', enabled == true)
+end
 Hclua.HC.lineReady = function(fn)
     fn()
 end

@@ -31,6 +31,8 @@ return function(runtime)
             _triggersEnabler=nop,
             _variableSetter=nop,
             _variableGetter=nop,
+            _eventLineEnabler=nop,
+            _eventTickEnabler=nop,
             params={}
         }
         setmetatable(world, self)
@@ -43,6 +45,12 @@ return function(runtime)
     function M.World:enableTriggers(tag)
         self._triggersEnabler(tag)
         return self
+    end
+    function M.World:enableEventLine(enabled)
+        self._eventLineEnabler(enabled)
+    end
+    function M.World:enableEventTick(enabled)
+        self._eventTickEnabler(enabled)
     end
     function M.World:getCommandPrefix()
         return self._commandPrefix
