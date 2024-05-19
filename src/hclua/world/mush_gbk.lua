@@ -156,6 +156,25 @@ end
 -- Hclua.HC.lineReady = function(fn)
 --     fn()
 -- end
+Hclua.world._userFileReader=function (name)
+    local file=io.open(GetInfo(54)..'.user.'..name,'r')
+    if file==nil then
+        return nil
+    end
+    local result=file:read('*a')
+    io.close(file)
+    return result
+end
+Hclua.world._userFileWriter=function (name,data)
+    local file=io.open(GetInfo(54)..'.user.'..name,'w')
+    if file==nil then
+        return
+    end
+    file:write(data)
+    io.close(file)
+    return
+end
+
 Hclua.HC.isConnected = IsConnected
 Hclua.HC.connect = Connect
 Hclua.HC.disconnect = Disconnect
