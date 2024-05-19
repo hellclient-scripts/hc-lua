@@ -19,3 +19,4 @@
 * 脚本会添加一个名为hclua.online，触发为^.*$为1的触发器
 * 脚本会添加间隔为0.1秒的临时触发器
 * lua全局空间会添加一个hclua表，里面是HCLua的所有相关代码
+* readUserFile和writeUserFile会操作profile文件夹下，以.user.xxx开头的文件，比如c:\modlet\profiles\xxx读写的data.txt就是 c:\modlet\profiles\xxx\user.data.txt
