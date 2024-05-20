@@ -18,3 +18,8 @@
 * lua全局空间会添加一个hclua表，里面是HCLua的所有相关代码
 * lua的package.path会添加mcl所在目录(GetInfo(67) .. "/?.lua")
 * readUserFile和writeUserFile会操作mcl文件夹下，以mcl全名.user.xxx开头的文件，比如c:\mcl\world.mcl读写的data.txt就是 c:\mcl\world.mcl.user.data.txt
+
+
+# 下一步
+
+[定制Hclua](customize.md)
