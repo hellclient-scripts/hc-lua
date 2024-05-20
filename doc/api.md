@@ -1,5 +1,17 @@
 # HCLua API一览
 
+## 用户接口
+
+所有设计中直接供用户在客户端调用的接口都在全局变量hclua.HC中
+
+建议将较短的全局变量值设为hclua.HC,方便调用
+
+[查看详细说明](../doc/hc.md)
+
+## 系统接口
+
+* [runtime 底层框架]
+
 ## lib 库
 * [commands 指令管理库](../src/hclua/lib/commands/README.md)
 * [container 容器库](../src/hclua/lib/container/README.md)

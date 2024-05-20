@@ -102,5 +102,6 @@ metronome模块的功能包括
 ## 文档
 
 * [快速上手](doc/quickstart.md)
+* [模块一览](doc/modules.md)
 * [API一览](doc/api.md)
 * [事件清单](doc/events.md)

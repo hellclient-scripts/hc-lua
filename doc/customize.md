@@ -51,3 +51,7 @@ HCLua有部分高级功能依赖^.*$的触发和0.1秒的计时器进行触发�
 具体可以将loader里的 Hclua.world:enableEventLine(行触发) 和 Hclua.world:enableEventTick(定时器) 函数的参数从true改为false
 
 **注意，强烈不建议这么做。**
+
+## 下一步
+
+[使用Hclua](use.md)
