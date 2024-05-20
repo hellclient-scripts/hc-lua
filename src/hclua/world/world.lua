@@ -6,11 +6,6 @@ return function(runtime)
     function M.DefaultPrinter(data)
         print(data)
     end
-
-    function M.DefaultLogger(data)
-        print(data)
-    end
-
     function M.DefaultSender(data)
         print(data)
     end
@@ -24,7 +19,6 @@ return function(runtime)
             eventBus=eventbus.new(),
             _commandPrefix='#hclua ',
             _printer = M.DefaultPrinter,
-            _logger = M.DefaultLogger,
             _sender = M.DefaultSender,
             _timer=M.DefaultTimer,
             _triggersDisabler=nop,
@@ -81,9 +75,6 @@ return function(runtime)
     end
     function M.World:getVariable(name)
         return self._variableGetter(name)
-    end
-    function M.World:log(data)
-        self._logger(data)
     end
     function M.World:send(data)
         self._sender(data)

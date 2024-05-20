@@ -55,34 +55,34 @@ function M.Runtime:new()
     setmetatable(runtime, self)
     runtime.HC.utils = runtime:requireModule('runtime/utils.lua')
     runtime.commands = runtime:require('lib/commands/commands.lua').new(function(cmd, data)
-        runtime:print('HCLua version ' .. M.version())
+        runtime.world:print('HCLua version ' .. M.version())
         if (cmd ~= nil and cmd ~= '') then
-            runtime:print('Command [' .. cmd .. '] not registered.')
+            runtime.world:print('Command [' .. cmd .. '] not registered.')
         end
-        runtime:print('Press ' .. runtime.world:getCommandPrefix() .. 'help to get commands list.')
+        runtime.world:print('Press ' .. runtime.world:getCommandPrefix() .. 'help to get commands list.')
     end)
     runtime.commands:register('help', function(data)
         data = data or ''
         if data == '' then
             local list = runtime.commands:list()
-            runtime:print('HCLua version ' .. M.version())
-            runtime:print('HCLua commands list:')
+            runtime.world:print('HCLua version ' .. M.version())
+            runtime.world:print('HCLua commands list:')
             for index, value in ipairs(list) do
-                runtime:print('  ' .. value:id() .. ' : ' .. value:intro())
+                runtime.world:print('  ' .. value:id() .. ' : ' .. value:intro())
             end
-            runtime:print('')
-            runtime:print(runtime.world:getCommandPrefix() .. 'help [command] to show command help detail.')
+            runtime.world:print('')
+            runtime.world:print(runtime.world:getCommandPrefix() .. 'help [command] to show command help detail.')
             return
         end
         local cmd = runtime.commands:getCommand(data)
         if cmd == nil then
-            runtime:print('HCLua version ' .. M.version())
-            runtime:print('Command [' .. data .. '] not registered.')
+            runtime.world:print('HCLua version ' .. M.version())
+            runtime.world:print('Command [' .. data .. '] not registered.')
             return
         end
-        runtime:print('HCLua version ' .. M.version())
-        runtime:print('Help command <' .. data .. '>.')
-        runtime:print('  ' .. cmd:desc())
+        runtime.world:print('HCLua version ' .. M.version())
+        runtime.world:print('Help command <' .. data .. '>.')
+        runtime.world:print('  ' .. cmd:desc())
     end):withIntro('Command help.')
 
     runtime.HC.exec = function(id, data)
@@ -116,22 +116,6 @@ end
 -- 链式设置环境输出函数
 function M.Runtime:withPrinter(printer)
     self._printer = printer
-    return self
-end
-
--- 打印数据
-function M.Runtime:print(data)
-    self._printer(data)
-end
-
--- 记录日志
-function M.Runtime:log(data)
-    self._logger(data)
-end
-
--- 链式设置环境日志函数
-function M.Runtime:withLogger(logger)
-    self._logger = logger
     return self
 end
 
