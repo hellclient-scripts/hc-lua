@@ -35,6 +35,9 @@ return function(runtime)
             _eventTickEnabler=nop,
             _userFileReader=nop,
             _userFileWriter=nop,
+            _connect=nop,
+            _disconnect=nop,
+            _isConnected=nop,
             params={}
         }
         setmetatable(world, self)
@@ -85,6 +88,15 @@ return function(runtime)
     function M.World:send(data)
         self._sender(data)
     end
+    function M.World:connect()
+        self._connect()
+    end
+    function M.World:diconnect()
+        self._disconnect()
+    end
+    function M.World:isConnected()
+        return self._isConnected()
+    end
     function M.World:readUserFile(name)
         return self._userFileReader(name)
     end
@@ -98,6 +110,9 @@ return function(runtime)
     end
     function M.World:install()
         runtime.HC.eventBus=self.eventBus
+        runtime.HC.connect=self._connect
+        runtime.HC.disconnect=self._disconnect
+        runtime.HC.isConnected=self._isConnected
         return self
     end
     function M.new()

@@ -175,9 +175,9 @@ Hclua.world._userFileWriter=function (name,data)
     return
 end
 
-Hclua.HC.isConnected = IsConnected
-Hclua.HC.connect = Connect
-Hclua.HC.disconnect = Disconnect
+Hclua.world._isConnected = IsConnected
+Hclua.world._connect = Connect
+Hclua.world._disconnect = Disconnect
 Hclua.world.params['on_connect'] = function()
     Hclua.world.eventBus:raiseEvent('world.connect')
 end

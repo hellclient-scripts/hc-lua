@@ -206,10 +206,13 @@ Hclua.HC.isConnected = function()
     return connected
 end
 
-Hclua.HC.connect = reconnect
-Hclua.HC.disconnect = disconnect
+Hclua.world._connect = reconnect
+Hclua.world._disconnect = disconnect
 
-Hclua.world.
+Hclua.world._isConnected= function()
+    local host, port, connected = getConnectionInfo()
+    return connected
+end
 
 registerAnonymousEventHandler("sysConnectionEvent", function()
     Hclua.world.eventBus:raiseEvent('world.connect')
