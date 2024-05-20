@@ -85,4 +85,27 @@ Hclua.HC.lines的工作是把字符串，特别是[[]] 包裹的长字符串切�
 * 第二个参数为true时分号;也会分割为行，否者只分割换行符
 
 
-### modules/core/metronome/commands.lua
+### modules/core/metronome/installcommands.lua
+
+安装本模块会自动安装 'modules/core/metronome/install.lua' 模块
+
+本模块提供一些默认的指令
+
+本模块在送指令会会抛出 'core.metronome.sent' 事件
+
+本模块提供的指令为
+* #wait 1000 整个节拍器等待参数毫秒
+* #t+ GROUPNAME 激活触发器组
+* #t- GROUPNAME 禁用触发器组
+* #pause 暂停节拍器
+* #resume 恢复节拍器
+* #print WORDSTOPRINT 打引文字
+
+同时，还能注册新指令,cmd为不包含#的指令部分，param为代入的参数
+```lua
+Hclua.HC.metronomeCommands.register('wait', function(metronome, param)
+        return function(metronome)
+            metronome:wait(param / 1000)
+        end
+end)
+```
