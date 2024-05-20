@@ -1,6 +1,5 @@
 return function(runtime)
     runtime:requireModule('modules/core/metronome/metronome.lua')
-    runtime:requireModule('modules/core/metronome/commands.lua')
     local metronome = runtime.HC.newMetronome()
     runtime.HC.sender = metronome
     runtime.HC.send=function (cmd)

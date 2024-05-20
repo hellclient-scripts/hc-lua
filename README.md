@@ -2,6 +2,8 @@
 
 HCLua是一款跨客户端的Lua机器人开发框架。
 
+[快速上手](doc/quickstart.md)
+
 ## 优势
 HCLua的优势为
 * 模块化设计
