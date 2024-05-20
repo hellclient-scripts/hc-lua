@@ -93,10 +93,31 @@ Hclua.world:enableEventTick(true)
 Hclua.world:withCommandPrefix('$')
 ```
 
-## world.getCommandPrefix()
+## world:getCommandPrefix()
 
 获取命令前缀，一般用于指令提示
 
 ```lua
 print(Hclua.world:getCommandPrefix())
+```
+
+## world:connect()
+
+连接到游戏
+```lua
+Hclua.world:connect()
+```
+
+## world:disconnect()
+
+断开游戏连接
+```lua
+Hclua.world:disconnect()
+```
+
+## world:isConnected()
+
+返回是否连接到游戏，true代表正在连接
+```lua
+print(Hclua.world:isConnected())
 ```
