@@ -9,7 +9,7 @@
 
 ### 客户端调整
 
-在你脚本的设置(ctrl+shift+6)的Connect和Disconnect事件指定的回调函数中，分别调用 Hclua.world.params.on_connect() 和 Hclua.world.params.on_disconnect()函数。
+在你脚本的设置(ctrl+shift+6)的Connect和Disconnect事件指定的回调函数中，分别调用 Hclua.world.params.on_connect 和 Hclua.world.params.on_disconnect函数。
 
 
 ## 副作用
