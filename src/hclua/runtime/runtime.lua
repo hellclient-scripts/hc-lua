@@ -10,9 +10,6 @@ M.versionPatch = 0
 M.DefaultPrinter = function(data)
     print(data)
 end
-M.DefaultLogger = function(data)
-    print(data)
-end
 -- 字符串格式的版本
 function M.version()
     return M.versionMajor .. '.' .. M.versionMinor .. '.' .. M.versionPatch

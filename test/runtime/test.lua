@@ -22,7 +22,7 @@ end
 function TestUtils()
     runtime.Path='../../src/hclua/'
     local rt=runtime.Runtime:new()
-    local jsondata=rt.Utils.json.decode(rt.Utils.json.encode('data'))
+    local jsondata=rt.HC.utils.json.decode(rt.HC.utils.json.encode('data'))
     lu.assertEquals(jsondata,'data')
 end
 os.exit( lu.LuaUnit.run() )
