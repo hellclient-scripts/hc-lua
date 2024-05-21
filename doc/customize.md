@@ -29,7 +29,7 @@ HCLua默认会注册一个#hclua 开头的别名，可以通过 进行#hclua sto
 
 ## 定制加载的module
 
-loader脚本中会使用Hclua:loadModules函数来加载脚本，代码一半如下
+loader脚本中会使用Hclua:loadModules函数来加载脚本，代码一般如下
 ```lua
 Hclua:loadModules(
     'module1',
