@@ -5,7 +5,7 @@ return function(runtime)
         M._commands[command] = handler
     end
     M.converter=function (metronome, data)
-        runtime.HC.eventBus.raiseEvent('core.metronome.sent',metronome)
+        runtime.HC.eventBus:raiseEvent('core.metronome.sent',metronome)
         return data
     end
     M.decoder = function(metronome, data)

@@ -101,9 +101,15 @@ return function(runtime)
     end
     function M.World:install()
         runtime.HC.eventBus=self.eventBus
-        runtime.HC.connect=self._connect
-        runtime.HC.disconnect=self._disconnect
-        runtime.HC.isConnected=self._isConnected
+        runtime.HC.connect=function ()
+            self._connect()    
+        end
+        runtime.HC.disconnect=function ()
+            self._disconnect()    
+        end
+        runtime.HC.isConnected=function ()
+            return self._isConnected()
+        end
         return self
     end
     function M.new()

@@ -201,11 +201,6 @@ end
 --     fn()
 -- end
 
-Hclua.HC.isConnected = function()
-    local host, port, connected = getConnectionInfo()
-    return connected
-end
-
 Hclua.world._connect = reconnect
 Hclua.world._disconnect = disconnect
 
