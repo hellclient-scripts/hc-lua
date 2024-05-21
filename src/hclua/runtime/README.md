@@ -59,7 +59,7 @@ runtime.commands是一个内建的指令组，默认对接了 #hclua COMMANDNAME
 
 内建一个help别名，可以根据需要注册其他别名
 
-### runtime.require
+### runtime:require
 
 引用模块。
 
@@ -69,4 +69,72 @@ runtime.commands是一个内建的指令组，默认对接了 #hclua COMMANDNAME
 
 ```lua
 local module=runtime:require('modulepath')
+```
+
+
+### runtime:requireModule
+
+通过模块模式引用模块
+
+引入的文件会当作函数，传入runtime,并获得返回值
+
+例:
+
+```lua
+function(runtime) 
+    local M={}
+    return m
+end
+```
+
+### runtime:loadModules
+
+批量导入模块，一般用于loader文件
+
+```lua
+Hclua:loadModules(
+    'MODULE1',
+    'MODULE2',
+    'MODULE3',
+)
+```
+同名文件不会重复引用
+
+### runtime:loaded
+
+判断某模块是否已经成功加载，返回值为布尔值
+
+```lua
+print(Hclua:loaded('MYMODULE'))
+```
+
+```lua
+local module=runtime:requireModule('mymodule')
+```
+
+### runtime:getPath
+
+返回加载根路径
+### runtime:getCharset
+
+返回客户端的编码
+
+可能值包括
+* utf8
+* gbk
+
+```lua
+print(runtime:getCharset())
+```
+
+### runtime:getHostType
+
+返回客户端的类型
+
+可能的值包括
+* mushclient
+* mudlet
+
+```lua
+print(runtime:getHostType())
 ```

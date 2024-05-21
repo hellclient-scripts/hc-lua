@@ -1,6 +1,6 @@
 local runtime = require('hclua/runtime/runtime')
 
-runtime.Path = getMudletHomeDir() .. '/hclua/'
+runtime.path = getMudletHomeDir() .. '/hclua/'
 Hclua = runtime.Runtime:new():withCharset('utf8'):withHostType('mudlet')
 
 local linelib = Hclua:requireModule('lib/line/line.lua')

@@ -1,5 +1,5 @@
 local runtime = require('hclua/runtime/runtime')
-runtime.Path = GetInfo(67) .. 'hclua/'
+runtime.path = GetInfo(67) .. 'hclua/'
 Hclua = runtime.Runtime:new():withCharset('gbk'):withHostType('mushclient')
 local line = Hclua:requireModule('lib/line/line.lua')
 local world = Hclua:requireModule('world/world.lua')
@@ -55,8 +55,8 @@ end
 Hclua.world.params['on_line'] = function()
     local linescount = GetLinesInBufferCount()
     local offset = 0
-    -- ±»wrapµÄĞĞ£¬ÉÏÒ»ĞĞµÄnewlineÊÇfalse
-    -- »¹ĞèÒªÅÅ³ıNoteºÍechoµÄÓÃ»§Êä³ö
+    -- ï¿½ï¿½wrapï¿½ï¿½ï¿½Ğ£ï¿½ï¿½ï¿½Ò»ï¿½Ğµï¿½newlineï¿½ï¿½false
+    -- ï¿½ï¿½ï¿½ï¿½Òªï¿½Å³ï¿½Noteï¿½ï¿½echoï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½
     while offset + linescount > 0 do
         if GetLineInfo(offset + linescount - 1, 3) or GetLineInfo(offset + linescount - 1, 4) or GetLineInfo(offset + linescount - 1, 5) then
             break
@@ -184,8 +184,8 @@ end
 Hclua.world.params['on_disconnect'] = function()
     Hclua.world.eventBus:raiseEvent('world.disconnect')
 end
-print('ÇëÔÚÄã½Å±¾µÄconnectÊÂ¼şÖĞµ÷ÓÃ Hclua.world.params.on_connect()')
-print('ÇëÔÚÄã½Å±¾µÄdisconnectÊÂ¼şÖĞµ÷ÓÃ Hclua.world.params.on_disconnect()')
+print('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½connectï¿½Â¼ï¿½ï¿½Ğµï¿½ï¿½ï¿½ Hclua.world.params.on_connect()')
+print('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½disconnectï¿½Â¼ï¿½ï¿½Ğµï¿½ï¿½ï¿½ Hclua.world.params.on_disconnect()')
 Hclua.world.params['on_alias'] = function(n, l, w)
     Hclua.HC.exec(w[2] or '', w[4] or '')
 end

@@ -1,6 +1,6 @@
 local lu = dofile('../../src/hclua/vendor/luaunit/luaunit.lua')
 local runtime=dofile('../../src/hclua/runtime/runtime.lua')
-runtime.Path='../../src/hclua/'
+runtime.path='../../src/hclua/'
 local rt=runtime.Runtime:new()
 local line=rt:requireModule('lib/line/line.lua')
 function TestLine()

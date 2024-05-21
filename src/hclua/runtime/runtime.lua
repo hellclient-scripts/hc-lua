@@ -30,7 +30,7 @@ function M.beforeVersion(major, minor, patch)
     return false
 end
 
-M.Path = 'hclua/'
+M.path = 'hclua/'
 M.Runtime = {}
 M.Runtime.__index = M.Runtime
 M.DefaultCharset = 'ansi'
@@ -110,18 +110,12 @@ function M.Runtime:withHostType(hosttype)
     return self
 end
 
--- 链式设置环境输出函数
-function M.Runtime:withPrinter(printer)
-    self._printer = printer
-    return self
-end
-
 -- 从模块的path变量里require lua文件
 function M.Runtime:require(path)
     if (self:loaded(path)) then
         return self._required[path]
     end
-    local module = dofile(M.Path .. path)
+    local module = dofile(M.path .. path)
     if module == nil then
         return nil
     end
@@ -154,7 +148,7 @@ function M.Runtime:loaded(path)
 end
 
 function M.Runtime:getPath()
-    return M.Path
+    return M.path
 end
 
 return M
