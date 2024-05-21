@@ -4,11 +4,8 @@ return function(runtime)
     M.register = function(command, handler)
         M._commands[command] = handler
     end
-    M.converter=function (metronome, data)
-        runtime.HC.eventBus:raiseEvent('core.metronome.sent',metronome)
-        return data
-    end
     M.decoder = function(metronome, data)
+        runtime.HC.eventBus:raiseEvent('core.metronome.sent',metronome)
         if (#data > 0 and string.sub(data, 1, 1) == '#') then
             local cmd, sep, param = string.match(data, "^#([^ ]+)(%s*)(.-)$")
             if cmd ~= nil then

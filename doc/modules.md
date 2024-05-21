@@ -91,7 +91,7 @@ Hclua.HC.lines的工作是把字符串，特别是[[]] 包裹的长字符串切�
 
 本模块提供一些默认的指令
 
-本模块在送指令会会抛出 'core.metronome.sent' 事件
+本模块在送指令后会抛出 'core.metronome.sent' 事件
 
 本模块提供的指令为
 * #wait 1000 整个节拍器等待参数毫秒

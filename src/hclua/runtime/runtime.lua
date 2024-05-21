@@ -130,7 +130,11 @@ function M.Runtime:requireModule(path)
     end
     local m = self:require(path)
     if m ~= nil then
-        self._required[path] = m(self)
+        local result=m(self)
+        if result==nil then
+            result ={}
+        end
+        self._required[path] = result
     else
         self._required[path] = nil
     end

@@ -78,7 +78,7 @@
 
 由hclua/modules/core/metronome/commands.lua发起
 
-发起时间为主节拍器发送成功调用Converter时
+发起时间为主节拍器发送成功调用Decoder时
 
 参数为主节拍器
 
