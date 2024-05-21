@@ -4,7 +4,7 @@
 
 说明:hclua的全局事件总线
 
-引入模块:runtime/world
+引入模块:world/world
 
 相关参考:[eventBus API](../src/hclua/lib/eventbus/README.md)
 
@@ -12,25 +12,25 @@
 
 说明:判断游戏是否连接
 
-引入模块:runtime/world
+引入模块:runtime/runtime.lua
 
 ## Hclua.HC.connect
 
 说明:连接游戏服务器，具体表现由客户端决定
 
-引入模块:runtime/world
+引入模块:runtime/runtime.lua
 
 ## Hclua.HC.disconnect
 
 说明:断开游戏服务器连接，具体表现由客户端决定
 
-引入模块:runtime/world
+引入模块:runtime/runtime.lua
 
 ## Hclua.HC.exec
 
 说明:调用Hclua.commands中注册的指令
 
-引入模块:runtime/runtime
+引入模块:runtime/runtime.lua
 
 相关参到[commands API](../src/hclua/lib/commands/README.md)
 
