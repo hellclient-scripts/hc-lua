@@ -4,7 +4,7 @@ local M = {}
 -- 大版本
 M.versionMajor = 0
 -- 子版本
-M.versionMinor = 20240507
+M.versionMinor = 20240521
 -- 补丁
 M.versionPatch = 0
 M.DefaultPrinter = function(data)
