@@ -110,7 +110,16 @@
 
 引入模块:modules/core/metronome/install.lua
 
-## runtime.HC.metronomeCommands
+## hclua.HC.metronomeCommands
 说明: 默认的节拍器指令.包含一个decoder和一个converter
 
 引入模块:modules/core/metronome/commands.lua
+
+
+## hclua.HC.utils
+
+说明：通用辅助函数
+
+[参考文档](utils.md)
+
+引入模块:runtime/runtime.lua
