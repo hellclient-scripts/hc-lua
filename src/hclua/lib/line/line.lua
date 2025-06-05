@@ -152,7 +152,7 @@ return function(runtime)
                         return nil
                     end
                     if word ~= nil then
-                        line:pushWord(word)
+                        line:appendWord(word)
                     end
                     word = M.Word:new()
                     word.Color = fg
@@ -165,7 +165,7 @@ return function(runtime)
                 elseif left > 5 and next == '1' then
                     -- #1RRGGBBRRGGBB0格式
                     if word ~= nil then
-                        line:pushWord(word)
+                        line:appendWord(word)
                     end
                     word = M.Word:new()
                     index = index + 2
